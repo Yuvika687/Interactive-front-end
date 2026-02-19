@@ -1,0 +1,68 @@
+/* ... existing code ... */
+
+/* --- Particles --- */
+.particle-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    /* Between deep and mid layers? No, lets put it global */
+}
+
+.particle {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: floating 20s infinite linear;
+}
+
+@keyframes floating {
+    0% {
+        transform: translateY(0px);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+}
+
+/* --- Pulse Animation for Active Memory --- */
+.memory-node.active-pulse {
+    animation: memoryPulse 3s infinite ease-in-out;
+}
+
+@keyframes memoryPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* Warmth Glow */
+.warm-glow {
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle, var(--color-happy) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 1s ease;
+    z-index: -1;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}

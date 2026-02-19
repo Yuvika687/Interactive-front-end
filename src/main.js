@@ -61,6 +61,9 @@ function init() {
 
     // 5. Time System
     startTimeSystem();
+
+    // 6. Particles
+    generateParticles();
 }
 
 function createMemoryNode(data) {
@@ -70,87 +73,95 @@ function createMemoryNode(data) {
     el.style.width = `${data.baseSize}px`;
     el.style.height = `${data.baseSize * 1.2}px`; // Portrait aspect
 
+    // Color Application based on emotion
+    el.style.border = `1px solid ${data.baseColor}40`; // Slight tint border
+    el.style.boxShadow = `0 4px 12px ${data.baseColor}20`;
+
     // Custom properties for logic
-    // We store visual position separate from data position to allow smooth interpolation if needed
     const node = {
         data: data,
         el: el,
         x: data.x,
         y: data.y,
-        z: data.z, // Depth
+        z: data.z,
         vx: data.driftSpeed.x,
         vy: data.driftSpeed.y,
-        hovered: false
+        hovered: false,
+
+        // Emotional State
+        currentWarmth: data.warmth || 0,
+        visitTimer: null,
+        visitStartTime: 0
     };
 
-    // Store reference on element for event delegation
+    // Store reference
     el.dataset.id = data.id;
-
     return node;
 }
 
 // --- The Physics Loop ---
 function loop() {
-    // Center point
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
 
     state.memories.forEach(node => {
         // 1. Apply Drift
-        if (!state.activeMemory && !node.hovered) {
-            node.x += node.vx;
-            node.y += node.vy;
+        // If hovered or active, drift STOPS or Slows drastically
+        let moveFactor = 1;
+        if (state.activeMemory) moveFactor = 0; // Universe pauses when focused
+        else if (node.hovered) moveFactor = 0.05; // "Gaze" effect
 
-            // Wrap around logic (Infinite Universe)
-            const bounds = 2500; // Match generation spread
+        if (moveFactor > 0) {
+            node.x += node.vx * moveFactor;
+            node.y += node.vy * moveFactor;
+
+            // Wrap around
+            const bounds = 2500;
             if (node.x > bounds) node.x = -bounds;
             if (node.x < -bounds) node.x = bounds;
             if (node.y > bounds) node.y = -bounds;
             if (node.y < -bounds) node.y = bounds;
         }
 
-        // 2. Mouse Parallax (The "Look" effect)
-        // Deeper memories move less than surface ones (Parallax)
-        // Z goes from -500 (deep) to 100 (surface)
-        // Factor: Surface=1, Deep=0.1
-        const depthFactor = (node.z + 500) / 600;
-        const mx = (state.mouseX - cx) * 0.05 * depthFactor;
-        const my = (state.mouseY - cy) * 0.05 * depthFactor;
+        // 2. Mouse Parallax
+        if (!state.activeMemory) {
+            const depthFactor = (node.z + 500) / 1000;
+            const mx = (state.mouseX - cx) * 0.02 * depthFactor;
+            const my = (state.mouseY - cy) * 0.02 * depthFactor;
 
-        // 3. Render
-        // We use translate3d for hardware accel
-        // We add the 'mx' directly to the transform, not the permanent XY
-        const renderX = node.x + mx;
-        const renderY = node.y + my;
+            // 3. Render
+            const scale = 1 + (node.currentWarmth * 0.2); // Warm memories are larger
+            node.el.style.transform = `translate3d(${node.x + mx}px, ${node.y + my}px, ${node.z}px) scale(${scale})`;
 
-        node.el.style.transform = `translate3d(${renderX.toFixed(1)}px, ${renderY.toFixed(1)}px, ${node.z}px)`;
+            // Dynamic Warmth Visuals
+            if (node.currentWarmth > 0) {
+                // Pulse influence
+                node.el.style.boxShadow = `0 0 ${20 + node.currentWarmth * 50}px ${node.data.baseColor}60`;
+                node.el.style.borderColor = node.data.baseColor;
+            }
+        }
     });
 
     requestAnimationFrame(loop);
 }
 
-// --- Interaction ---
+// --- Interaction & Emotional Logic ---
 function setupEvents() {
-    // Mouse Move
     window.addEventListener('mousemove', e => {
         state.mouseX = e.clientX;
         state.mouseY = e.clientY;
     });
 
-    // Delegation for Hover/Click
-    // Doing per-node listeners is expensive for 1000 nodes, 
-    // but `mouseenter`/`mouseleave` don't bubble.
-    // However, we used standard :hover CSS for the basic glow. 
-    // For Logic (pausing drift), we can use mouseover on the container.
-
+    // Hover - "The Gaze"
     dom.universe.addEventListener('mouseover', e => {
+        if (state.activeMemory) return; // Don't hover background when focused
         if (e.target.classList.contains('memory-node')) {
             const id = e.target.dataset.id;
             const node = state.memories.find(m => m.data.id == id);
             if (node) {
                 node.hovered = true;
-                state.hoverTarget = node;
-                // Optional: Update HUD with memory details?
+                node.el.style.zIndex = 9999;
+                // "Responds to you" - slight brightness bump handled by CSS
             }
         }
     });
@@ -161,24 +172,20 @@ function setupEvents() {
             const node = state.memories.find(m => m.data.id == id);
             if (node) {
                 node.hovered = false;
-                state.hoverTarget = null;
+                node.el.style.zIndex = 'auto';
             }
         }
     });
 
-    // Click to Open
     dom.universe.addEventListener('click', e => {
+        if (state.activeMemory) return;
         if (e.target.classList.contains('memory-node')) {
-            const id = e.target.dataset.id;
-            openMemory(id);
+            openMemory(e.target.dataset.id);
         }
     });
 
-    // Close
     dom.closeBtn.addEventListener('click', closeMemory);
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeMemory();
-    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMemory(); });
 }
 
 function openMemory(id) {
@@ -186,18 +193,62 @@ function openMemory(id) {
     if (!node) return;
 
     state.activeMemory = node;
+    node.visitStartTime = Date.now();
 
-    // Populate Overlay
+    // UI Transitions
     dom.focusImg.src = node.data.src;
-    dom.focusTitle.textContent = "Memory " + node.data.id; // Placeholder title
+    dom.focusTitle.textContent = "Memory " + node.data.id;
     dom.focusDate.textContent = node.data.created.toDateString();
 
-    // Show
+    // Inject Emotional Context
+    const warmthPercent = Math.floor(node.currentWarmth * 100);
+    dom.focusStats.innerHTML = `
+        <div class="focus-stat"><b>${node.data.visits}</b> Visits</div>
+        <div class="focus-stat"><b>${warmthPercent}%</b> Warmth</div>
+        <div class="focus-stat" style="color:${node.data.baseColor}">Type: ${node.data.emotion.toUpperCase()}</div>
+    `;
+
     dom.overlay.classList.add('active');
+    dom.universe.style.transition = "transform 1s ease, filter 1s ease";
+    dom.universe.style.filter = "blur(10px) brightness(0.2)";
+    dom.universe.style.transform = "scale(1.1)"; // Zoom in slightly
+
+    // Start "Loving" Timer
+    node.visitTimer = setInterval(() => {
+        const duration = (Date.now() - node.visitStartTime) / 1000;
+
+        // "Your attention is LOVE"
+        // Every 10 seconds, adds 1% warmth
+        if (duration % 10 < 1) {
+            node.currentWarmth = Math.min(1, node.currentWarmth + 0.01);
+            // Update UI live
+            dom.focusStats.querySelector('.focus-stat:nth-child(2) b').innerText = Math.floor(node.currentWarmth * 100) + "%";
+        }
+    }, 1000);
 }
 
 function closeMemory() {
+    if (!state.activeMemory) return;
+
+    const node = state.activeMemory;
+
+    // Stop Timer
+    clearInterval(node.visitTimer);
+    const sessionDuration = (Date.now() - node.visitStartTime) / 1000;
+
+    // Update Stats
+    node.data.visits++;
+    node.data.timeSpent += sessionDuration;
+    node.data.lastVisited = new Date();
+
+    // "Leave" effect - Pulse
+    // We can animate this in CSS or just leave the warmth state
+
+    // Reset UI
     dom.overlay.classList.remove('active');
+    dom.universe.style.filter = "none";
+    dom.universe.style.transform = "none";
+
     state.activeMemory = null;
 }
 
@@ -215,6 +266,26 @@ function startTimeSystem() {
     };
     setInterval(update, 1000);
     update();
+}
+
+// --- Particles ---
+function generateParticles() {
+    const container = document.createElement('div');
+    container.className = 'particle-container';
+    document.body.appendChild(container);
+
+    for (let i = 0; i < 50; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${Math.random() * 100}vw`;
+        p.style.top = `${Math.random() * 100}vh`;
+        p.style.animationDuration = `${Math.random() * 20 + 10}s`;
+        p.style.animationDelay = `-${Math.random() * 20}s`;
+        container.appendChild(p);
+    }
 }
 
 // Run

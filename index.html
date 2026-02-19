@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/style.css">
+    <link rel="stylesheet" href="src/particles.css">
 </head>
 
 <body>
@@ -39,8 +40,11 @@
             <div class="focus-content">
                 <div class="media-container" id="focus-media"></div>
                 <div class="meta-data">
-                    <h2 id="focus-title"></h2>
-                    <p id="focus-date" class="date-stamp"></p>
+                    <h2 id="focus-title" class="focus-title"></h2>
+                    <p id="focus-date" class="focus-date"></p>
+                    <div class="focus-stats-container">
+                        <!-- Stats injected via JS -->
+                    </div>
                     <p id="focus-desc" class="memory-desc"></p>
                 </div>
             </div>
