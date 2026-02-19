@@ -18,13 +18,32 @@
 
     <!-- Main UI Layer (Floating) -->
     <main id="app">
-        <!-- Minimal Centered Header (Executive Vision) -->
-        <div class="zen-header">
-            <h1 class="zen-title">S E R E N I T Y</h1>
-            <div class="zen-time">
-                <span id="clock">00:00</span> • <span id="mode-indicator">Night</span>
+
+        <!-- Cinematic Header -->
+        <header class="cinematic-header">
+            <div class="header-left">
+                <span id="clock">11:41</span>
             </div>
-        </div>
+            <div class="header-center">
+                <h1 class="logo-text">S E R E N I T Y</h1>
+            </div>
+            <div class="header-right">
+                <span id="mode-indicator" class="mode-capsule">NIGHT MODE</span>
+            </div>
+        </header>
+
+        <!-- Foreground Glass Grid -->
+        <section class="memory-grid" id="foreground-grid">
+            <!-- Cards injected via JS -->
+        </section>
+
+        <!-- Cinematic Footer -->
+        <footer class="cinematic-footer">
+            <button class="glass-pill">
+                See All Memories &rarr;
+            </button>
+        </footer>
+
     </main>
 
     <!-- Focus Overlay -->

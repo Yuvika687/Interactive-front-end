@@ -70,6 +70,29 @@ function init() {
 
     // 6. Particles
     generateParticles();
+
+    // 7. Cinematic Grid
+    renderCinematicGrid();
+}
+
+function renderCinematicGrid() {
+    const grid = document.getElementById('foreground-grid');
+    if (!grid) return;
+
+    // Pick 3 Top Memories for the Grid (Center Stage)
+    // In real app, these are "Featured" or "Recent"
+    // We pick slightly different ones each time or static for demo
+    const featured = state.memories.slice(0, 3);
+
+    grid.innerHTML = featured.map(node => `
+        <article class="cinematic-card" onclick="openMemory(${node.data.id})">
+            <img src="${node.data.src}" loading="lazy">
+            <div class="card-meta">
+                <div class="card-date">${node.data.created.toLocaleDateString()}</div>
+                <div class="card-title">Memory ${node.data.id}</div>
+            </div>
+        </article>
+    `).join('');
 }
 
 function createMemoryNode(data) {

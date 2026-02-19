@@ -1,241 +1,227 @@
 :root {
-    /* --- Serenity Executive Palette --- */
-    --bg-color: #0B0F1A;
+    /* --- Serenity Cinematic Palette --- */
+    --bg-deep: #0B0F1A;
     /* Deep Space Navy */
+    --bg-haze: #1A2340;
+    /* Indigo Haze */
 
-    /* Emotional Colors */
-    --color-happy: #E6B88A;
-    /* Warm Memory Gold */
-    --color-bittersweet: #9D8BB0;
-    /* Emotional Violet */
-    --color-grief: #5D6D7E;
-    --color-peaceful: #5B9AA0;
-    /* Calm Teal */
-    --color-white: rgba(255, 255, 255, 0.9);
+    /* Accents */
+    --accent-violet: rgba(157, 139, 176, 0.5);
+    --accent-teal: rgba(91, 154, 160, 0.6);
+    --accent-gold: rgba(230, 184, 138, 0.6);
 
-    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Glass Engine */
+    --glass-panel: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.1);
+    --blur-strength: 30px;
+
+    --ease-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 body {
     margin: 0;
     height: 100vh;
     overflow: hidden;
-    background-color: var(--bg-color);
+    background: radial-gradient(circle at 50% 120%, var(--bg-haze), var(--bg-deep) 60%);
     font-family: "SF Pro Display", "Inter", sans-serif;
-    color: var(--color-white);
+    color: white;
     user-select: none;
-    transition: background-color 3s ease;
-    /* Slow time shifts */
 }
 
-/* --- The Universe --- */
+/* --- Ambient Universe (Background) --- */
 #memory-universe {
     position: fixed;
     inset: 0;
-    perspective: 1000px;
-    transform-style: preserve-3d;
-    overflow: hidden;
+    z-index: 0;
+    opacity: 0.4;
+    /* Faded background for depth */
+    pointer-events: none;
+    /* Let clicks pass to grid? No, grid is distinct mode */
+    filter: blur(2px);
+    /* Depth of field */
 }
 
+/* Updated Memory Node for Background */
 .memory-node {
     position: absolute;
     background-size: cover;
     background-position: center;
     border-radius: 50%;
-    /* Points of light are round initially? Or soft squares? User said 'points of light'. Let's go soft sq for now */
-    border-radius: 4px;
-    will-change: transform, opacity;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
-    /* Faint glow */
-    cursor: pointer;
-    transition: box-shadow 0.4s ease, filter 0.4s ease, transform 0.8s var(--ease-out), opacity 0.8s ease;
-    opacity: 0.8;
-}
-
-/* "Memories as Light" - Hover Interaction */
-.memory-node:hover {
-    z-index: 9999 !important;
-    filter: brightness(1.3);
-    box-shadow: 0 0 40px var(--glow-color, var(--color-happy));
-    transform: scale(1.1);
-    /* Slight swell */
-}
-
-/* Layers */
-.layer-abyss {
-    opacity: 0.1;
-    filter: grayscale(1) blur(2px);
-    pointer-events: none;
-}
-
-.layer-reflection {
-    opacity: 0.2;
-    filter: grayscale(0.8) blur(1px);
-}
-
-.layer-nostalgia {
-    opacity: 0.4;
-    filter: sepia(0.4);
-}
-
-.layer-recent {
-    opacity: 0.7;
-}
-
-.layer-present {
-    opacity: 0.9;
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
-}
-
-/* --- Minimal UI --- */
-#app {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 10000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* Center the Zen Header initially? Or top center? Mockup showed top center */
-    padding-top: 5vh;
-    align-items: flex-start;
-}
-
-.zen-header {
-    text-align: center;
-    opacity: 0.8;
-    mix-blend-mode: screen;
-}
-
-.zen-title {
-    font-size: 0.9rem;
-    font-weight: 300;
-    letter-spacing: 0.5em;
-    margin: 0 0 0.5rem 0;
-    opacity: 0.9;
-}
-
-.zen-time {
-    font-size: 0.8rem;
-    font-weight: 200;
+    /* Distant lights look rounder */
+    box-shadow: 0 0 20px var(--accent-violet);
     opacity: 0.6;
-    letter-spacing: 0.1em;
+    transition: transform 1s linear;
+    /* Smooth drift */
 }
 
-/* --- Focus Overlay --- */
-#focus-overlay {
-    position: fixed;
-    inset: 0;
-    background: #0B0F1A;
-    /* Solid Deep Navy, no blur, pure focus */
-    z-index: 20000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.8s ease;
-}
-
-#focus-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.focus-card {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    background: transparent;
+/* --- Main UI Layer --- */
+#app {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    padding: 3vh 5vw;
+    background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(11, 15, 26, 0.4) 100%);
+    /* Vignette */
+}
+
+/* Header */
+.cinematic-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 2rem;
+    padding: 1rem 2rem;
+    background: var(--glass-panel);
+    backdrop-filter: blur(var(--blur-strength));
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
 }
 
-.focus-visual {
-    height: 60vh;
-    width: auto;
-    border-radius: 0;
-    /* Clean */
-    box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
-    /* Deep shadow */
-    position: relative;
-}
-
-.focus-visual img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    max-width: 90vw;
-}
-
-.focus-data {
-    text-align: center;
-    color: var(--color-white);
-    max-width: 600px;
-    width: 90%;
-}
-
-.focus-title {
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.05em;
-    opacity: 0.9;
-}
-
-.focus-stat-line {
+.header-left,
+.header-right {
     font-size: 0.9rem;
-    opacity: 0.5;
-    margin-bottom: 2rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+    width: 120px;
+    /* Balance */
 }
 
-.focus-stats-container {
+.header-right {
+    text-align: right;
+}
+
+.logo-text {
+    font-size: 1rem;
+    font-weight: 200;
+    letter-spacing: 0.4em;
+    margin: 0;
+    opacity: 0.9;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.mode-capsule {
+    color: var(--accent-violet);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+}
+
+/* Memory Grid */
+.memory-grid {
+    flex: 1;
     display: flex;
     justify-content: center;
-    gap: 2rem;
-    font-size: 0.8rem;
-    opacity: 0.6;
-    margin-bottom: 2rem;
+    align-items: center;
+    gap: 3rem;
+    margin: 2rem 0;
+    perspective: 1000px;
 }
 
-.memory-input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--color-white);
-    font-family: inherit;
-    font-size: 1.1rem;
-    text-align: center;
-    padding: 0.5rem;
-    outline: none;
-    resize: none;
-    height: 3rem;
-    transition: border-color 0.3s ease;
-}
-
-.memory-input:focus {
-    border-bottom-color: var(--color-happy);
-}
-
-.close-btn {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
+.cinematic-card {
+    width: 280px;
+    height: 420px;
+    border-radius: 24px;
+    background: var(--glass-panel);
+    backdrop-filter: blur(var(--blur-strength));
+    border: 1px solid var(--glass-border);
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px var(--glass-highlight);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.6s var(--ease-cinematic);
     cursor: pointer;
-    opacity: 0.3;
-    transition: opacity 0.2s;
 }
 
-.close-btn:hover {
-    opacity: 0.8;
+.cinematic-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    mix-blend-mode: overlay;
+    /* Blend with glass */
+}
+
+.cinematic-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.6),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+        0 0 30px var(--accent-teal);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.cinematic-card:hover img {
+    opacity: 1;
+    transform: scale(1.1);
+    mix-blend-mode: normal;
+}
+
+.card-meta {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+}
+
+.cinematic-card:hover .card-meta {
+    transform: translateY(0);
+}
+
+.card-date {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 0.2rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+/* Footer */
+.cinematic-footer {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1rem;
+}
+
+.glass-pill {
+    padding: 1rem 3rem;
+    border-radius: 99px;
+    background: var(--glass-panel);
+    backdrop-filter: blur(var(--blur-strength));
+    border: 1px solid var(--glass-border);
+    color: white;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.glass-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Overlay Overrides for Cinematic Mode */
+#focus-overlay {
+    background: rgba(11, 15, 26, 0.95);
 }
