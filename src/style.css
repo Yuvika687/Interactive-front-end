@@ -1,227 +1,270 @@
 :root {
-    /* --- Serenity Cinematic Palette --- */
-    --bg-deep: #0B0F1A;
-    /* Deep Space Navy */
-    --bg-haze: #1A2340;
-    /* Indigo Haze */
+    /* --- Serenity Emotional Palette --- */
+    --base-navy: #0f172a;
+    /* Deep Night/Security */
+    --base-cream: #f8f5f2;
+    /* Soft Memory (Day) */
 
-    /* Accents */
-    --accent-violet: rgba(157, 139, 176, 0.5);
-    --accent-teal: rgba(91, 154, 160, 0.6);
-    --accent-gold: rgba(230, 184, 138, 0.6);
+    /* Emotional Accents (Desaturated) */
+    --glow-gold: rgba(230, 184, 138, 0.4);
+    /* Nostalgia */
+    --glow-pink: rgba(216, 167, 177, 0.3);
+    /* Love/Soft */
+    --glow-blue: rgba(144, 168, 190, 0.3);
+    /* Quiet/Calm */
+    --glow-violet: rgba(119, 107, 129, 0.4);
+    /* Deep Emotion */
 
-    /* Glass Engine */
-    --glass-panel: rgba(255, 255, 255, 0.03);
+    /* Glass Engine 2.0 (Privacy/Frost) */
+    --glass-panel: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-highlight: rgba(255, 255, 255, 0.1);
-    --blur-strength: 30px;
+    /* Barely visible */
+    --glass-blur: 50px;
+    /* Heavy frost */
 
-    --ease-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-breathing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
     margin: 0;
     height: 100vh;
     overflow: hidden;
-    background: radial-gradient(circle at 50% 120%, var(--bg-haze), var(--bg-deep) 60%);
+    background-color: var(--base-navy);
     font-family: "SF Pro Display", "Inter", sans-serif;
-    color: white;
+    /* Apple System Font */
+    color: rgba(255, 255, 255, 0.9);
     user-select: none;
+    transition: background-color 5s ease;
 }
 
-/* --- Ambient Universe (Background) --- */
-#memory-universe {
+/* --- Atmospheric Background --- */
+#atmospheric-background {
     position: fixed;
     inset: 0;
     z-index: 0;
-    opacity: 0.4;
-    /* Faded background for depth */
-    pointer-events: none;
-    /* Let clicks pass to grid? No, grid is distinct mode */
-    filter: blur(2px);
-    /* Depth of field */
+    overflow: hidden;
 }
 
-/* Updated Memory Node for Background */
-.memory-node {
+.gradient-layer {
     position: absolute;
-    background-size: cover;
-    background-position: center;
     border-radius: 50%;
-    /* Distant lights look rounder */
-    box-shadow: 0 0 20px var(--accent-violet);
+    filter: blur(80px);
+    /* Massive softness */
     opacity: 0.6;
-    transition: transform 1s linear;
-    /* Smooth drift */
+    animation: breathe 15s infinite ease-in-out;
 }
 
-/* --- Main UI Layer --- */
+.warm-glow {
+    top: -20%;
+    left: -10%;
+    width: 60vw;
+    height: 60vh;
+    background: var(--glow-gold);
+    animation-delay: -5s;
+}
+
+.deep-shadow {
+    bottom: -20%;
+    right: -10%;
+    width: 70vw;
+    height: 70vh;
+    background: var(--glow-violet);
+}
+
+.fog-layer {
+    position: absolute;
+    inset: 0;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    /* Or generate noise via canvas */
+    opacity: 0.03;
+    /* Texture */
+    pointer-events: none;
+}
+
+@keyframes breathe {
+
+    0%,
+    100% {
+        transform: scale(1) translate(0, 0);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.1) translate(20px, -20px);
+        opacity: 0.7;
+    }
+}
+
+/* --- Dust Particles --- */
+.dust-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.dust-particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: drift 20s infinite linear;
+}
+
+@keyframes drift {
+    0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.5;
+    }
+
+    80% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(-10vh) translateX(20px);
+        opacity: 0;
+    }
+}
+
+/* --- UI Container --- */
 #app {
     position: relative;
     z-index: 10;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 3vh 5vw;
-    background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(11, 15, 26, 0.4) 100%);
-    /* Vignette */
+    padding: 4vh 6vw;
+    /* More spacious */
 }
 
-/* Header */
+/* Minimal Header */
 .cinematic-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
-    background: var(--glass-panel);
-    backdrop-filter: blur(var(--blur-strength));
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    width: 100%;
-}
-
-.header-left,
-.header-right {
-    font-size: 0.9rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    opacity: 0.8;
-    width: 120px;
-    /* Balance */
-}
-
-.header-right {
-    text-align: right;
+    padding: 0 1rem;
+    opacity: 0.7;
+    /* Subdued */
 }
 
 .logo-text {
-    font-size: 1rem;
-    font-weight: 200;
-    letter-spacing: 0.4em;
-    margin: 0;
-    opacity: 0.9;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    opacity: 0.8;
 }
 
-.mode-capsule {
-    color: var(--accent-violet);
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-}
-
-/* Memory Grid */
+/* Foreground Glass Grid */
 .memory-grid {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 3rem;
-    margin: 2rem 0;
-    perspective: 1000px;
+    gap: 4rem;
 }
 
 .cinematic-card {
-    width: 280px;
-    height: 420px;
-    border-radius: 24px;
+    width: 320px;
+    height: 480px;
+    border-radius: 32px;
+    /* Super soft */
+
+    /* Soft Glassmorphism */
     background: var(--glass-panel);
-    backdrop-filter: blur(var(--blur-strength));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
-    box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.4),
-        inset 0 0 0 1px var(--glass-highlight);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+
     position: relative;
     overflow: hidden;
-    transition: all 0.6s var(--ease-cinematic);
     cursor: pointer;
+    transition: transform 0.8s var(--ease-breathing), box-shadow 0.8s ease;
 }
 
 .cinematic-card img {
-    position: absolute;
-    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.7;
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    mix-blend-mode: overlay;
-    /* Blend with glass */
+    opacity: 0.85;
+    /* Fading memory feel */
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    filter: sepia(0.1) contrast(0.95);
+    /* Nostalgic filter */
 }
 
 .cinematic-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow:
-        0 40px 80px rgba(0, 0, 0, 0.6),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.3),
-        0 0 30px var(--accent-teal);
-    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
 }
 
 .cinematic-card:hover img {
     opacity: 1;
-    transform: scale(1.1);
-    mix-blend-mode: normal;
+    transform: scale(1.05);
+    /* Slow breathe zoom */
+    filter: none;
 }
 
 .card-meta {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 2rem;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-    transform: translateY(100%);
-    transition: transform 0.4s ease;
+    bottom: 2rem;
+    left: 2rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.5s ease;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .cinematic-card:hover .card-meta {
+    opacity: 1;
     transform: translateY(0);
 }
 
 .card-date {
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--accent-gold);
-    margin-bottom: 0.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.4rem;
 }
 
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 300;
+    /* Thin, elegant type */
+    letter-spacing: -0.01em;
 }
 
 /* Footer */
 .cinematic-footer {
     display: flex;
     justify-content: center;
-    padding-bottom: 1rem;
+    padding-bottom: 2rem;
 }
 
 .glass-pill {
-    padding: 1rem 3rem;
+    padding: 0.8rem 2.5rem;
     border-radius: 99px;
-    background: var(--glass-panel);
-    backdrop-filter: blur(var(--blur-strength));
-    border: 1px solid var(--glass-border);
-    color: white;
-    font-size: 0.9rem;
-    letter-spacing: 0.1em;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
 }
 
 .glass-pill:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.15);
 }
 
-/* Overlay Overrides for Cinematic Mode */
+/* Overlay Override */
 #focus-overlay {
-    background: rgba(11, 15, 26, 0.95);
+    background: rgba(15, 23, 42, 0.8);
+    /* Deep Navy Blur backing */
+    backdrop-filter: blur(60px);
 }
