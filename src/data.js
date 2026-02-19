@@ -38,6 +38,13 @@ const LAYERS = [
     { name: 'present', count: 50, opacity: [0.35, 0.5], size: [120, 170], z: 100 }
 ];
 
+const CONSTELLATIONS = [
+    { name: "Her", x: -500, y: -200, color: "#E6B88A" }, // Warm Gold
+    { name: "The Lake", x: 800, y: 300, color: "#5B9AA0" }, // Teal
+    { name: "Winter 2024", x: -200, y: 800, color: "#9D8BB0" }, // Violet
+    { name: "Childhood", x: 0, y: 0, color: "#F0B27A" } // Amber
+];
+
 function generateMemoryData() {
     const memories = [];
     let idCounter = 0;
@@ -47,9 +54,21 @@ function generateMemoryData() {
             const emotion = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
             const photo = PHOTOS[Math.floor(Math.random() * PHOTOS.length)];
 
-            // Random position in 3D space
-            // Spread deeply in X/Y/Z
-            const spread = 2000;
+            // Constellation Logic
+            // 60% chance to belong to a constellation, 40% random drift
+            let x, y, constellationId = null;
+
+            if (Math.random() > 0.4) {
+                const c = CONSTELLATIONS[Math.floor(Math.random() * CONSTELLATIONS.length)];
+                const spread = 400; // How tight the cluster is
+                x = c.x + (Math.random() - 0.5) * spread;
+                y = c.y + (Math.random() - 0.5) * spread;
+                constellationId = c.name;
+            } else {
+                const spread = 3000;
+                x = (Math.random() - 0.5) * spread;
+                y = (Math.random() - 0.5) * spread;
+            }
 
             memories.push({
                 id: ++idCounter,
@@ -57,31 +76,32 @@ function generateMemoryData() {
                 emotion: emotion.type,
                 baseColor: emotion.color,
                 layer: layer.name,
+                constellationId: constellationId, // NEW
 
                 // Visual constraints
-                x: (Math.random() - 0.5) * spread * 2,
-                y: (Math.random() - 0.5) * spread * 2,
-                z: layer.z + (Math.random() - 0.5) * 100, // Slight depth variation
+                x: x,
+                y: y,
+                z: layer.z + (Math.random() - 0.5) * 100,
 
                 baseSize: Math.random() * (layer.size[1] - layer.size[0]) + layer.size[0],
                 baseOpacity: Math.random() * (layer.opacity[1] - layer.opacity[0]) + layer.opacity[0],
 
                 // Movement
                 driftSpeed: {
-                    x: (Math.random() - 0.5) * 0.2, // Very slow drift
-                    y: (Math.random() - 0.5) * 0.2
+                    x: (Math.random() - 0.5) * 0.1, // Even slower drift for "Stars" feel
+                    y: (Math.random() - 0.5) * 0.1
                 },
 
                 // State
                 warmth: 0,
                 visits: 0,
                 lastVisited: null,
-                created: new Date(Date.now() - Math.random() * 10000000000) // Random past date
+                created: new Date(Date.now() - Math.random() * 10000000000)
             });
         }
     });
 
-    return memories.sort((a, b) => a.z - b.z); // Render back to front
+    return memories.sort((a, b) => a.z - b.z);
 }
 
 // Export for main.js 

@@ -211,14 +211,19 @@ function openMemory(id) {
     dom.focusTitle.textContent = "Memory " + node.data.id;
     dom.focusDate.textContent = node.data.created.toDateString();
 
-    // Inject Emotional Context
+    // Inject Emotional    // Stats
     const warmthPercent = Math.floor(node.currentWarmth * 100);
-    dom.focusStats.innerHTML = `
+    let metaHTML = `
         <div class="focus-stat"><b>${node.data.visits}</b> Visits</div>
         <div class="focus-stat"><b>${warmthPercent}%</b> Warmth</div>
-        <div class="focus-stat" style="color:${node.data.baseColor}">Type: ${node.data.emotion.toUpperCase()}</div>
     `;
 
+    if (node.data.constellationId) {
+        metaHTML += `<div class="focus-stat" style="color:var(--color-happy)">✦ ${node.data.constellationId}</div>`;
+    }
+    metaHTML += `<div class="focus-stat" style="color:${node.data.baseColor}">Type: ${node.data.emotion.toUpperCase()}</div>`;
+
+    dom.focusStats.innerHTML = metaHTML;
     dom.overlay.classList.add('active');
     dom.universe.style.transition = "transform 1s ease, filter 1s ease";
     dom.universe.style.filter = "blur(10px) brightness(0.2)";
