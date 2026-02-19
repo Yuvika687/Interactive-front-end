@@ -34,19 +34,25 @@
     </main>
 
     <!-- Focus Overlay -->
-    <div id="focus-overlay" class="hidden">
-        <div class="glass-panel focus-card">
-            <button id="close-focus" class="icon-btn" aria-label="Close">×</button>
-            <div class="focus-content">
-                <div class="media-container" id="focus-media"></div>
-                <div class="meta-data">
-                    <h2 id="focus-title" class="focus-title"></h2>
-                    <p id="focus-date" class="focus-date"></p>
-                    <div class="focus-stats-container">
-                        <!-- Stats injected via JS -->
-                    </div>
-                    <p id="focus-desc" class="memory-desc"></p>
+    <div id="focus-overlay">
+        <div class="focus-card">
+            <button class="close-btn" aria-label="Close">×</button>
+
+            <div class="focus-visual">
+                <img src="" alt="Memory">
+            </div>
+
+            <div class="focus-data">
+                <h2 class="focus-title"></h2>
+                <div class="focus-stat-line">
+                    <span class="focus-date"></span>
                 </div>
+
+                <div class="focus-stats-container">
+                    <!-- Injected stats -->
+                </div>
+
+                <p id="focus-desc" class="memory-desc"></p>
             </div>
         </div>
     </div>
