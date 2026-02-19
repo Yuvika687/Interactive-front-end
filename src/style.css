@@ -1,20 +1,17 @@
 :root {
-    /* --- Serenity Core Palette --- */
-    --bg-color: #05080F;
-    /* Deep Abyss */
+    /* --- Serenity Executive Palette --- */
+    --bg-color: #0B0F1A;
+    /* Deep Space Navy */
 
     /* Emotional Colors */
-    --color-happy: #F0B27A;
-    --color-bittersweet: #B784A7;
+    --color-happy: #E6B88A;
+    /* Warm Memory Gold */
+    --color-bittersweet: #9D8BB0;
+    /* Emotional Violet */
     --color-grief: #5D6D7E;
-    --color-peaceful: #76D7C4;
-    --color-nostalgic: #B97C4B;
-    --color-loved: #6C3483;
-
-    /* UI Glass */
-    --glass-bg: rgba(20, 25, 40, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-blur: 24px;
+    --color-peaceful: #5B9AA0;
+    /* Calm Teal */
+    --color-white: rgba(255, 255, 255, 0.9);
 
     --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -25,9 +22,10 @@ body {
     overflow: hidden;
     background-color: var(--bg-color);
     font-family: "SF Pro Display", "Inter", sans-serif;
-    color: white;
+    color: var(--color-white);
     user-select: none;
-    /* Immersive */
+    transition: background-color 3s ease;
+    /* Slow time shifts */
 }
 
 /* --- The Universe --- */
@@ -36,104 +34,107 @@ body {
     inset: 0;
     perspective: 1000px;
     transform-style: preserve-3d;
-    /* Critical for 3D layers */
     overflow: hidden;
-    /* We will move the camera (universe container) or move items? 
-       Moving items is easier for "Infinite" feel if we wrap them. */
 }
 
 .memory-node {
     position: absolute;
     background-size: cover;
     background-position: center;
-    border-radius: 12px;
-    /* Soft squares */
+    border-radius: 50%;
+    /* Points of light are round initially? Or soft squares? User said 'points of light'. Let's go soft sq for now */
+    border-radius: 4px;
     will-change: transform, opacity;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+    /* Faint glow */
     cursor: pointer;
-    transition: box-shadow 0.4s ease, filter 0.4s ease, transform 0.8s var(--ease-out);
+    transition: box-shadow 0.4s ease, filter 0.4s ease, transform 0.8s var(--ease-out), opacity 0.8s ease;
+    opacity: 0.8;
 }
 
-/* Interaction States */
+/* "Memories as Light" - Hover Interaction */
 .memory-node:hover {
     z-index: 9999 !important;
-    /* Bring to front of its local layer context if possible, but strict z-index might fight 3D. */
-    /* Actually with translate3d z-axis, z-index is less relevant unless coplanar. 
-       We'll rely on scale and brightness. */
-    filter: brightness(1.2);
-    box-shadow: 0 0 20px var(--glow-color, rgba(255, 255, 255, 0.2));
+    filter: brightness(1.3);
+    box-shadow: 0 0 40px var(--glow-color, var(--color-happy));
+    transform: scale(1.1);
+    /* Slight swell */
 }
 
-/* Layers - CSS helper classes (though mostly handled in JS via inline styles) */
+/* Layers */
 .layer-abyss {
-    filter: grayscale(0.8) brightness(0.4);
+    opacity: 0.1;
+    filter: grayscale(1) blur(2px);
     pointer-events: none;
 }
 
 .layer-reflection {
-    filter: grayscale(0.4) brightness(0.6);
+    opacity: 0.2;
+    filter: grayscale(0.8) blur(1px);
 }
 
 .layer-nostalgia {
-    filter: sepia(0.3) brightness(0.8);
+    opacity: 0.4;
+    filter: sepia(0.4);
 }
 
 .layer-recent {
-    filter: brightness(0.9);
+    opacity: 0.7;
 }
 
 .layer-present {
-    filter: brightness(1.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
 }
 
-/* --- UI Overlay --- */
+/* --- Minimal UI --- */
 #app {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 10000;
     display: flex;
-    flex-direction: column;
-    padding: 2rem;
-}
-
-header {
-    pointer-events: auto;
-    display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    /* Center the Zen Header initially? Or top center? Mockup showed top center */
+    padding-top: 5vh;
+    align-items: flex-start;
 }
 
-.brand {
-    font-weight: 300;
-    letter-spacing: 0.2rem;
+.zen-header {
+    text-align: center;
     opacity: 0.8;
+    mix-blend-mode: screen;
 }
 
-.hud {
-    display: flex;
-    gap: 2rem;
-    font-size: 0.85rem;
+.zen-title {
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 0.5em;
+    margin: 0 0 0.5rem 0;
+    opacity: 0.9;
+}
+
+.zen-time {
+    font-size: 0.8rem;
+    font-weight: 200;
     opacity: 0.6;
+    letter-spacing: 0.1em;
 }
 
 /* --- Focus Overlay --- */
 #focus-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(5, 8, 15, 0.9);
-    /* Deep backing */
-    backdrop-filter: blur(40px);
+    background: #0B0F1A;
+    /* Solid Deep Navy, no blur, pure focus */
     z-index: 20000;
     display: flex;
     align-items: center;
-    /* Center vertically */
     justify-content: center;
-    /* Center horizontally */
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.8s ease;
 }
 
 #focus-overlay.active {
@@ -142,64 +143,84 @@ header {
 }
 
 .focus-card {
-    width: 60vw;
-    height: 70vh;
-    max-width: 1200px;
+    width: 100%;
+    height: 100%;
+    max-width: none;
     background: transparent;
     display: flex;
-    gap: 4rem;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 2rem;
 }
 
 .focus-visual {
-    flex: 1.5;
-    height: 100%;
-    border-radius: 4px;
-    /* Cinematic sharpish corners */
-    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
+    height: 60vh;
+    width: auto;
+    border-radius: 0;
+    /* Clean */
+    box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+    /* Deep shadow */
     position: relative;
-    overflow: hidden;
 }
 
 .focus-visual img {
-    width: 100%;
     height: 100%;
+    width: auto;
     object-fit: contain;
-    /* Show full image */
+    max-width: 90vw;
 }
 
 .focus-data {
-    flex: 1;
-    color: white;
+    text-align: center;
+    color: var(--color-white);
+    max-width: 600px;
+    width: 90%;
 }
 
 .focus-title {
-    font-size: 3rem;
-    font-weight: 200;
+    font-size: 1.5rem;
+    font-weight: 300;
     margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
 }
 
-.focus-date {
+.focus-stat-line {
     font-size: 0.9rem;
     opacity: 0.5;
+    margin-bottom: 2rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    margin-bottom: 3rem;
 }
 
-.focus-stat {
+.focus-stats-container {
     display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    opacity: 0.8;
-    font-weight: 300;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin-bottom: 2rem;
 }
 
-.focus-stat b {
-    font-weight: 500;
-    color: var(--color-gold, #F7DC6F);
+.memory-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
+    font-family: inherit;
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 0.5rem;
+    outline: none;
+    resize: none;
+    height: 3rem;
+    transition: border-color 0.3s ease;
+}
+
+.memory-input:focus {
+    border-bottom-color: var(--color-happy);
 }
 
 .close-btn {
@@ -211,10 +232,10 @@ header {
     color: white;
     font-size: 2rem;
     cursor: pointer;
-    opacity: 0.5;
+    opacity: 0.3;
     transition: opacity 0.2s;
 }
 
 .close-btn:hover {
-    opacity: 1;
+    opacity: 0.8;
 }

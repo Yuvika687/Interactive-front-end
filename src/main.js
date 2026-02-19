@@ -263,21 +263,8 @@ function closeMemory() {
     state.activeMemory = null;
 }
 
-// --- Time System ---
-function startTimeSystem() {
-    const update = () => {
-        const now = new Date();
-        dom.clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        // Simple mock mode logic (can be expanded)
-        const h = now.getHours();
-        let label = "Night Mode";
-        if (h > 6 && h < 18) label = "Day Mode";
-        dom.mode.textContent = label;
-    };
-    setInterval(update, 1000);
-    update();
-}
+// Helper: Ensure we have the input element cached if not already
+if (!dom.input) dom.input = document.getElementById('memory-input');
 
 // --- Particles ---
 function generateParticles() {
