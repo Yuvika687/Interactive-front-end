@@ -1,244 +1,247 @@
 :root {
-    /* --- Serenity Emotional Palette --- */
-    --base-navy: #0f172a;
-    /* Deep Night/Security */
-    --base-cream: #f8f5f2;
-    /* Soft Memory (Day) */
+    /* --- Serenity: Pearl & Lavender Edition --- */
 
-    /* Emotional Accents (Desaturated) */
-    --glow-gold: rgba(230, 184, 138, 0.4);
-    /* Nostalgia */
-    --glow-pink: rgba(216, 167, 177, 0.3);
-    /* Love/Soft */
-    --glow-blue: rgba(144, 168, 190, 0.3);
-    /* Quiet/Calm */
-    --glow-violet: rgba(119, 107, 129, 0.4);
-    /* Deep Emotion */
+    /* Base Foundations */
+    --bg-pearl: #fdfcfe;
+    --bg-lavender: #f4f0f8;
 
-    /* Glass Engine 2.0 (Privacy/Frost) */
-    --glass-panel: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    /* Barely visible */
-    --glass-blur: 50px;
-    /* Heavy frost */
+    /* Emotional Gradients (Gradients are defined in classes, variables for reference) */
+    --color-gold: rgba(255, 214, 165, 0.4);
+    --color-peach: rgba(255, 173, 173, 0.4);
+    --color-rose: rgba(255, 183, 178, 0.4);
+    --color-blue: rgba(162, 210, 255, 0.4);
+    --color-indigo: rgba(72, 61, 139, 0.4);
 
-    --ease-breathing: cubic-bezier(0.4, 0, 0.2, 1);
+    /* Glass */
+    --glass-surface: rgba(255, 255, 255, 0.4);
+    --glass-frost: 40px;
+    --glass-border: rgba(255, 255, 255, 0.6);
+
+    /* Text */
+    --text-primary: #334155;
+    --text-secondary: #64748b;
+
+    --ease-dream: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
     margin: 0;
     height: 100vh;
     overflow: hidden;
-    background-color: var(--base-navy);
-    font-family: "SF Pro Display", "Inter", sans-serif;
-    /* Apple System Font */
-    color: rgba(255, 255, 255, 0.9);
-    user-select: none;
-    transition: background-color 5s ease;
+    background: linear-gradient(135deg, var(--bg-pearl) 0%, var(--bg-lavender) 100%);
+    font-family: "SF Pro Display", "Inter", -apple-system, sans-serif;
+    color: var(--text-primary);
+    transition: background 5s ease;
 }
 
-/* --- Atmospheric Background --- */
+/* --- Atmospheric Background System --- */
 #atmospheric-background {
     position: fixed;
     inset: 0;
     z-index: 0;
-    overflow: hidden;
 }
 
+/* Dynamic Gradient Orb */
 .gradient-layer {
     position: absolute;
-    border-radius: 50%;
+    width: 120vw;
+    height: 120vh;
+    background: radial-gradient(circle, var(--color-gold), transparent 70%);
+    /* Default warm */
+    top: -50%;
+    left: -20%;
     filter: blur(80px);
-    /* Massive softness */
     opacity: 0.6;
-    animation: breathe 15s infinite ease-in-out;
+    animation: drift-orb 30s infinite alternate ease-in-out;
+    transition: background 5s ease;
+    /* Fluid color shifting */
 }
 
-.warm-glow {
-    top: -20%;
-    left: -10%;
-    width: 60vw;
-    height: 60vh;
-    background: var(--glow-gold);
-    animation-delay: -5s;
-}
-
+/* Second Orb for complexity */
 .deep-shadow {
-    bottom: -20%;
-    right: -10%;
-    width: 70vw;
-    height: 70vh;
-    background: var(--glow-violet);
+    top: auto;
+    bottom: -40%;
+    left: auto;
+    right: -20%;
+    background: radial-gradient(circle, var(--color-blue), transparent 60%);
+    animation-delay: -15s;
+    opacity: 0.5;
 }
 
-.fog-layer {
+/* Light Leak (Film effect) */
+.light-leak {
     position: absolute;
-    inset: 0;
-    background: url('https://grainy-gradients.vercel.app/noise.svg');
-    /* Or generate noise via canvas */
-    opacity: 0.03;
-    /* Texture */
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 40%, rgba(255, 230, 200, 0.15) 60%, transparent 80%);
+    mix-blend-mode: screen;
+    opacity: 0.6;
+    animation: leak-shift 20s infinite linear;
     pointer-events: none;
 }
 
-@keyframes breathe {
+/* Noise/Grain */
+.noise-overlay {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    /* Very subtle texture */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
 
-    0%,
+@keyframes drift-orb {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
     100% {
-        transform: scale(1) translate(0, 0);
-        opacity: 0.5;
+        transform: translate(100px, 50px) scale(1.1);
+    }
+}
+
+@keyframes leak-shift {
+    0% {
+        transform: translateX(-10%) translateY(-10%);
+        opacity: 0.4;
     }
 
     50% {
-        transform: scale(1.1) translate(20px, -20px);
         opacity: 0.7;
-    }
-}
-
-/* --- Dust Particles --- */
-.dust-container {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
-
-.dust-particle {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 50%;
-    animation: drift 20s infinite linear;
-}
-
-@keyframes drift {
-    0% {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0;
-    }
-
-    20% {
-        opacity: 0.5;
-    }
-
-    80% {
-        opacity: 0.5;
     }
 
     100% {
-        transform: translateY(-10vh) translateX(20px);
-        opacity: 0;
+        transform: translateX(10%) translateY(10%);
+        opacity: 0.4;
     }
 }
 
-/* --- UI Container --- */
+/* --- UI Components --- */
 #app {
     position: relative;
     z-index: 10;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 4vh 6vw;
-    /* More spacious */
+    padding: 2vh 4vw;
 }
 
-/* Minimal Header */
+/* Clean Header */
 .cinematic-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
-    opacity: 0.7;
-    /* Subdued */
+    padding: 1rem;
+    color: var(--text-secondary);
 }
 
 .logo-text {
     font-size: 0.9rem;
-    font-weight: 400;
-    letter-spacing: 0.2em;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+    text-transform: uppercase;
     opacity: 0.8;
 }
 
-/* Foreground Glass Grid */
+.mode-capsule {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 6px 16px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    color: var(--text-secondary);
+}
+
+/* Memory Grid - Pearl Style */
 .memory-grid {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 4rem;
+    gap: 3rem;
+    perspective: 1200px;
 }
 
 .cinematic-card {
-    width: 320px;
-    height: 480px;
+    width: 300px;
+    height: 460px;
     border-radius: 32px;
-    /* Super soft */
 
-    /* Soft Glassmorphism */
-    background: var(--glass-panel);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    /* Pearl Glass */
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(var(--glass-frost));
+    -webkit-backdrop-filter: blur(var(--glass-frost));
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.05),
+        /* Soft shadow */
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    /* Inner light */
 
     position: relative;
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.8s var(--ease-breathing), box-shadow 0.8s ease;
+    transition: all 0.6s var(--ease-dream);
 }
 
 .cinematic-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.85;
-    /* Fading memory feel */
-    transition: opacity 0.8s ease, transform 0.8s ease;
-    filter: sepia(0.1) contrast(0.95);
-    /* Nostalgic filter */
+    opacity: 0.9;
+    transition: transform 0.8s ease;
+    mix-blend-mode: multiply;
+    /* Blends nicely with white background */
 }
 
 .cinematic-card:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(255, 255, 255, 0.9);
 }
 
 .cinematic-card:hover img {
-    opacity: 1;
-    transform: scale(1.05);
-    /* Slow breathe zoom */
-    filter: none;
+    transform: scale(1.06);
+    mix-blend-mode: normal;
 }
 
-.card-meta {
+.cinematic-card .card-meta {
     position: absolute;
-    bottom: 2rem;
-    left: 2rem;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
+    color: var(--text-primary);
+    transform: translateY(20px);
     opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.5s ease;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s ease;
 }
 
 .cinematic-card:hover .card-meta {
-    opacity: 1;
     transform: translateY(0);
-}
-
-.card-date {
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 0.4rem;
+    opacity: 1;
 }
 
 .card-title {
-    font-size: 1.4rem;
-    font-weight: 300;
-    /* Thin, elegant type */
-    letter-spacing: -0.01em;
+    font-weight: 500;
+    font-size: 1.2rem;
 }
 
-/* Footer */
+.card-date {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+
+/* Footer Pill */
 .cinematic-footer {
     display: flex;
     justify-content: center;
@@ -246,25 +249,51 @@ body {
 }
 
 .glass-pill {
-    padding: 0.8rem 2.5rem;
-    border-radius: 99px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
+    padding: 12px 32px;
+    background: white;
+    border-radius: 100px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .glass-pill:hover {
-    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
 }
 
-/* Overlay Override */
-#focus-overlay {
-    background: rgba(15, 23, 42, 0.8);
-    /* Deep Navy Blur backing */
-    backdrop-filter: blur(60px);
+/* Dust Overlay */
+.dust-container {
+    pointer-events: none;
+    z-index: 5;
+}
+
+.dust-particle {
+    background: rgba(0, 0, 0, 0.2) !important;
+    /* Dust is dark on light bg */
+}
+
+/* --- Emotional States (Applied to Body via JS) --- */
+body.mode-happy .gradient-layer {
+    background: radial-gradient(circle, var(--color-gold), transparent 70%);
+}
+
+body.mode-romantic .gradient-layer {
+    background: radial-gradient(circle, var(--color-peach), transparent 70%);
+}
+
+body.mode-romantic .deep-shadow {
+    background: radial-gradient(circle, var(--color-rose), transparent 60%);
+}
+
+body.mode-sad .gradient-layer {
+    background: radial-gradient(circle, var(--color-blue), transparent 70%);
+}
+
+body.mode-deep .gradient-layer {
+    background: radial-gradient(circle, var(--color-indigo), transparent 70%);
 }
