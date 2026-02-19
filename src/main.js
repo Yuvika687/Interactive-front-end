@@ -38,6 +38,8 @@ const dom = {
 
 // --- Initialization ---
 function init() {
+    console.log("Initializing Serenity...");
+
     // 1. Generate Data
     if (!window.SerenityData) {
         console.error("SerenityData not loaded");
@@ -56,7 +58,11 @@ function init() {
     dom.universe.appendChild(fragment);
 
     // 4. Start Events & Loop
-    setupEvents();
+    try {
+        setupEvents();
+    } catch (e) {
+        console.error("Error setting up events:", e);
+    }
     requestAnimationFrame(loop);
 
     // 5. Time System
@@ -101,6 +107,7 @@ function createMemoryNode(data) {
 
 // --- The Physics Loop ---
 function loop() {
+    // Center point - CRITICAL for centering the universe
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
 
@@ -115,7 +122,7 @@ function loop() {
             node.x += node.vx * moveFactor;
             node.y += node.vy * moveFactor;
 
-            // Wrap around
+            // Wrap around logic (Infinite Universe)
             const bounds = 2500;
             if (node.x > bounds) node.x = -bounds;
             if (node.x < -bounds) node.x = bounds;
@@ -130,12 +137,16 @@ function loop() {
             const my = (state.mouseY - cy) * 0.02 * depthFactor;
 
             // 3. Render
-            const scale = 1 + (node.currentWarmth * 0.2); // Warm memories are larger
-            node.el.style.transform = `translate3d(${node.x + mx}px, ${node.y + my}px, ${node.z}px) scale(${scale})`;
+            const scale = 1 + (node.currentWarmth * 0.2);
+
+            // Offset by Center (cx, cy) so (0,0) is center of screen
+            const renderX = cx + node.x + mx - (parseFloat(node.el.style.width) / 2);
+            const renderY = cy + node.y + my - (parseFloat(node.el.style.height) / 2);
+
+            node.el.style.transform = `translate3d(${renderX.toFixed(1)}px, ${renderY.toFixed(1)}px, ${node.z}px) scale(${scale})`;
 
             // Dynamic Warmth Visuals
             if (node.currentWarmth > 0) {
-                // Pulse influence
                 node.el.style.boxShadow = `0 0 ${20 + node.currentWarmth * 50}px ${node.data.baseColor}60`;
                 node.el.style.borderColor = node.data.baseColor;
             }
