@@ -1,299 +1,453 @@
 :root {
-    /* --- Serenity: Pearl & Lavender Edition --- */
+    --text-color: #f0e6ea;
+    --ease-slow: cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    /* Base Foundations */
-    --bg-pearl: #fdfcfe;
-    --bg-lavender: #f4f0f8;
-
-    /* Emotional Gradients (Gradients are defined in classes, variables for reference) */
-    --color-gold: rgba(255, 214, 165, 0.4);
-    --color-peach: rgba(255, 173, 173, 0.4);
-    --color-rose: rgba(255, 183, 178, 0.4);
-    --color-blue: rgba(162, 210, 255, 0.4);
-    --color-indigo: rgba(72, 61, 139, 0.4);
-
-    /* Glass */
-    --glass-surface: rgba(255, 255, 255, 0.4);
-    --glass-frost: 40px;
-    --glass-border: rgba(255, 255, 255, 0.6);
-
-    /* Text */
-    --text-primary: #334155;
-    --text-secondary: #64748b;
-
-    --ease-dream: cubic-bezier(0.4, 0, 0.2, 1);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    background: #0b0a0c;
+    /* deep anchor */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    transition: background-color 2s ease;
     overflow: hidden;
-    background: linear-gradient(135deg, var(--bg-pearl) 0%, var(--bg-lavender) 100%);
-    font-family: "SF Pro Display", "Inter", -apple-system, sans-serif;
-    color: var(--text-primary);
-    transition: background 5s ease;
 }
 
-/* --- Atmospheric Background System --- */
-#atmospheric-background {
+/* ---- Atmosphere ---- */
+.memory-atmosphere {
     position: fixed;
-    inset: 0;
-    z-index: 0;
-}
-
-/* Dynamic Gradient Orb */
-.gradient-layer {
-    position: absolute;
-    width: 120vw;
-    height: 120vh;
-    background: radial-gradient(circle, var(--color-gold), transparent 70%);
-    /* Default warm */
-    top: -50%;
-    left: -20%;
-    filter: blur(80px);
-    opacity: 0.6;
-    animation: drift-orb 30s infinite alternate ease-in-out;
-    transition: background 5s ease;
-    /* Fluid color shifting */
-}
-
-/* Second Orb for complexity */
-.deep-shadow {
-    top: auto;
-    bottom: -40%;
-    left: auto;
-    right: -20%;
-    background: radial-gradient(circle, var(--color-blue), transparent 60%);
-    animation-delay: -15s;
-    opacity: 0.5;
-}
-
-/* Light Leak (Film effect) */
-.light-leak {
-    position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, transparent 40%, rgba(255, 230, 200, 0.15) 60%, transparent 80%);
-    mix-blend-mode: screen;
-    opacity: 0.6;
-    animation: leak-shift 20s infinite linear;
+    z-index: 0;
+    overflow: hidden;
     pointer-events: none;
 }
 
-/* Noise/Grain */
-.noise-overlay {
+.atmo-gradient {
     position: absolute;
-    inset: 0;
-    opacity: 0.04;
-    /* Very subtle texture */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    pointer-events: none;
-    mix-blend-mode: overlay;
+    inset: -10%;
+    background: radial-gradient(circle at 30% 40%, rgba(230, 210, 250, 0.25) 0%, transparent 35%),
+        radial-gradient(circle at 80% 70%, rgba(255, 225, 200, 0.3) 0%, transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(200, 220, 255, 0.2) 0%, transparent 45%),
+        linear-gradient(145deg, #2b2836, #1e1b28);
+    filter: blur(40px) saturate(1.5);
+    transition: background 3s ease;
+    animation: slowBreathingGradient 16s infinite alternate ease-in-out;
 }
 
-@keyframes drift-orb {
+/* ---- REALISTIC CLOUDS ---- */
+/* We simulate clouds using shadow-stacking and blurs for a fluffy look */
+.cloud-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    perspective: 1000px;
+    z-index: 1;
+    /* Below particles, above gradient */
+    opacity: 0.6;
+}
+
+.cloud {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    filter: blur(25px);
+    /* Soft fluffiness */
+    opacity: 0.4;
+    transition: background 3s ease;
+    /* Takes on light color */
+}
+
+/* Cloud Shapes via Box Shadow stacking */
+.cloud::after,
+.cloud::before {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+}
+
+.cloud-1 {
+    width: 300px;
+    height: 120px;
+    top: 10%;
+    left: -20%;
+    box-shadow:
+        100px -40px 0 20px #fff,
+        200px 20px 0 -10px #fff;
+    animation: driftCloud 120s linear infinite;
+}
+
+.cloud-2 {
+    width: 400px;
+    height: 150px;
+    top: 40%;
+    right: -20%;
+    box-shadow:
+        -120px -50px 0 30px #fff,
+        -220px 30px 0 10px #fff;
+    animation: driftCloudReverse 140s linear infinite;
+    opacity: 0.3;
+}
+
+.cloud-3 {
+    width: 250px;
+    height: 100px;
+    bottom: 10%;
+    left: 10%;
+    box-shadow: 80px -30px 0 10px #fff;
+    animation: driftCloud 160s linear infinite;
+    opacity: 0.2;
+}
+
+@keyframes driftCloud {
     0% {
-        transform: translate(0, 0) scale(1);
+        transform: translateX(-10%);
     }
 
     100% {
-        transform: translate(100px, 50px) scale(1.1);
+        transform: translateX(120vw);
     }
 }
 
-@keyframes leak-shift {
+@keyframes driftCloudReverse {
     0% {
-        transform: translateX(-10%) translateY(-10%);
-        opacity: 0.4;
+        transform: translateX(10%);
+    }
+
+    100% {
+        transform: translateX(-120vw);
+    }
+}
+
+/* Particles */
+.memory-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.particle {
+    position: absolute;
+    background: rgba(255, 245, 240, 0.2);
+    border-radius: 50%;
+    filter: blur(8px);
+    width: 8rem;
+    height: 8rem;
+    top: -5%;
+    left: -5%;
+    animation: floatParticle 40s infinite alternate ease-in-out;
+}
+
+.particle-2 {
+    width: 14rem;
+    height: 14rem;
+    background: rgba(220, 200, 255, 0.12);
+    filter: blur(16px);
+    bottom: -5%;
+    right: -5%;
+    position: absolute;
+    animation: floatParticle2 34s infinite alternate;
+}
+
+.particle-3 {
+    width: 6rem;
+    height: 6rem;
+    background: rgba(255, 220, 190, 0.18);
+    filter: blur(12px);
+    top: 20%;
+    left: 70%;
+    position: absolute;
+    animation: floatParticle3 28s infinite alternate;
+}
+
+.constellation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(255, 240, 230, 0.2) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.25;
+    animation: twinkleHint 10s infinite alternate;
+}
+
+/* Animations */
+@keyframes slowBreathingGradient {
+    0% {
+        opacity: 0.7;
+        transform: scale(1) rotate(0deg);
     }
 
     50% {
-        opacity: 0.7;
+        opacity: 0.9;
+        transform: scale(1.02) rotate(0.3deg);
     }
 
     100% {
-        transform: translateX(10%) translateY(10%);
-        opacity: 0.4;
+        opacity: 0.7;
+        transform: scale(0.98) rotate(-0.2deg);
     }
 }
 
-/* --- UI Components --- */
-#app {
-    position: relative;
-    z-index: 10;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 2vh 4vw;
+@keyframes floatParticle {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(12%, 8%);
+    }
 }
 
-/* Clean Header */
-.cinematic-header {
+@keyframes floatParticle2 {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(-8%, -6%);
+    }
+}
+
+@keyframes floatParticle3 {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(2%, -10%);
+    }
+}
+
+@keyframes twinkleHint {
+    0% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 0.35;
+    }
+}
+
+/* ---- Dashboard ---- */
+.vault-dashboard {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1200px;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255, 245, 245, 0.06);
+    border-radius: 3.5rem;
+    border: 1px solid rgba(255, 235, 230, 0.15);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 230, 240, 0.05) inset;
+    padding: 2.5rem 3rem;
+    transition: background 0.5s, border-color 0.5s;
+}
+
+.dashboard-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Header */
+.vault-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    color: var(--text-secondary);
+    color: rgba(255, 250, 245, 0.9);
+    border-bottom: 1px solid rgba(255, 235, 225, 0.15);
+    padding-bottom: 1.5rem;
 }
 
-.logo-text {
-    font-size: 0.9rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    color: var(--text-primary);
-    text-transform: uppercase;
-    opacity: 0.8;
-}
-
-.mode-capsule {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    padding: 6px 16px;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 20px;
-    color: var(--text-secondary);
-}
-
-/* Memory Grid - Pearl Style */
-.memory-grid {
-    flex: 1;
+.logo-area {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 3rem;
-    perspective: 1200px;
+    gap: 0.75rem;
 }
 
-.cinematic-card {
-    width: 300px;
-    height: 460px;
-    border-radius: 32px;
-
-    /* Pearl Glass */
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(var(--glass-frost));
-    -webkit-backdrop-filter: blur(var(--glass-frost));
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.05),
-        /* Soft shadow */
-        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-    /* Inner light */
-
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.6s var(--ease-dream);
+.logo-icon {
+    font-size: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 18px;
+    padding: 0.25rem;
 }
 
-.cinematic-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.9;
-    transition: transform 0.8s ease;
-    mix-blend-mode: multiply;
-    /* Blends nicely with white background */
+.logo-text h1 {
+    font-weight: 350;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to right, #fdeff2, #f3e7ed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.cinematic-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    box-shadow:
-        0 40px 80px rgba(0, 0, 0, 0.08),
-        0 0 0 1px rgba(255, 255, 255, 0.9);
+.logo-text span {
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: rgba(230, 215, 230, 0.7);
+    letter-spacing: 0.3px;
+    display: block;
 }
 
-.cinematic-card:hover img {
-    transform: scale(1.06);
-    mix-blend-mode: normal;
+.header-right {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    color: rgba(240, 225, 240, 0.7);
 }
 
-.cinematic-card .card-meta {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 2rem;
-    background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
-    color: var(--text-primary);
-    transform: translateY(20px);
-    opacity: 0;
-    transition: all 0.4s ease;
+.memory-mood {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 235, 245, 0.08);
+    padding: 0.4rem 1rem;
+    border-radius: 40px;
+    border: 0.5px solid rgba(255, 210, 230, 0.2);
 }
 
-.cinematic-card:hover .card-meta {
-    transform: translateY(0);
-    opacity: 1;
+.mood-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d4b0b5;
+    box-shadow: 0 0 6px #ffc0cb;
+}
+
+/* Grid */
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.8rem;
+}
+
+.memory-card {
+    background: rgba(250, 240, 245, 0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 235, 240, 0.1);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.3);
+    padding: 1.8rem 1.5rem;
+    color: #f0eae8;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.memory-card:hover {
+    transform: translateY(-6px);
+    background: rgba(255, 240, 245, 0.09);
+    border-color: rgba(255, 220, 230, 0.3);
+    box-shadow: 0 25px 40px -15px rgba(255, 208, 207, 0.15);
+}
+
+.card-icon {
+    font-size: 2.2rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
 }
 
 .card-title {
     font-weight: 500;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+    color: rgb(255, 240, 245);
 }
 
-.card-date {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.25rem;
-}
-
-
-/* Footer Pill */
-.cinematic-footer {
+.card-desc {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    font-weight: 300;
+    color: rgba(255, 235, 240, 0.7);
     display: flex;
-    justify-content: center;
-    padding-bottom: 2rem;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.glass-pill {
-    padding: 12px 32px;
-    background: white;
-    border-radius: 100px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    color: var(--text-primary);
-    font-weight: 500;
+.floating-symbol {
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: rgba(230, 210, 230, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-top: 1px dashed rgba(255, 215, 225, 0.2);
+    padding-top: 0.8rem;
+}
+
+/* Footer */
+.vault-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 235, 240, 0.1);
+    color: rgba(245, 225, 235, 0.8);
     font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
 }
 
-.glass-pill:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+.security-badge {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 1.2rem;
+    border-radius: 60px;
+    backdrop-filter: blur(6px);
+    border: 0.5px solid rgba(255, 200, 220, 0.15);
 }
 
-/* Dust Overlay */
-.dust-container {
-    pointer-events: none;
-    z-index: 5;
+.time-capsule {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    font-weight: 300;
 }
 
-.dust-particle {
-    background: rgba(0, 0, 0, 0.2) !important;
-    /* Dust is dark on light bg */
+.hour-marker {
+    width: 30px;
+    height: 2px;
+    background: rgba(255, 210, 230, 0.3);
+    border-radius: 4px;
 }
 
-/* --- Emotional States (Applied to Body via JS) --- */
-body.mode-happy .gradient-layer {
-    background: radial-gradient(circle, var(--color-gold), transparent 70%);
+.breath-hint {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    opacity: 0.6;
 }
 
-body.mode-romantic .gradient-layer {
-    background: radial-gradient(circle, var(--color-peach), transparent 70%);
+/* Responsive */
+@media (max-width: 900px) {
+    .memory-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
-body.mode-romantic .deep-shadow {
-    background: radial-gradient(circle, var(--color-rose), transparent 60%);
-}
+@media (max-width: 600px) {
+    .memory-grid {
+        grid-template-columns: 1fr;
+    }
 
-body.mode-sad .gradient-layer {
-    background: radial-gradient(circle, var(--color-blue), transparent 70%);
-}
-
-body.mode-deep .gradient-layer {
-    background: radial-gradient(circle, var(--color-indigo), transparent 70%);
+    .vault-dashboard {
+        padding: 1.5rem;
+    }
 }

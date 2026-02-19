@@ -1,86 +1,141 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>S E R E N I T Y • Memory OS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mnemonic · Secure Memory Vault</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/style.css">
-    <link rel="stylesheet" href="src/particles.css">
 </head>
 
 <body>
-    <!-- Atmospheric Memory Box (Background System) -->
-    <div id="atmospheric-background">
-        <div class="gradient-layer warm-glow"></div>
-        <div class="gradient-layer deep-shadow"></div>
-        <div class="fog-layer"></div>
-        <div class="light-leak"></div>
-        <div class="noise-overlay"></div>
-        <div class="dust-container"></div>
+
+    <!-- Atmospheric Layer (Background) -->
+    <div class="memory-atmosphere">
+        <div class="atmo-gradient"></div>
+
+        <!-- LUXURIOUS CLOUDS -->
+        <div class="cloud-container">
+            <div class="cloud cloud-1"></div>
+            <div class="cloud cloud-2"></div>
+            <div class="cloud cloud-3"></div>
+        </div>
+
+        <div class="memory-particles">
+            <div class="particle"></div>
+            <div class="particle-2"></div>
+            <div class="particle-3"></div>
+        </div>
+        <div class="constellation"></div>
     </div>
 
-    <!-- Main UI Layer (Floating) -->
-    <main id="app">
+    <!-- Main Glass Dashboard -->
+    <div class="vault-dashboard">
+        <div class="dashboard-content">
 
-        <!-- Cinematic Header -->
-        <header class="cinematic-header">
-            <div class="header-left">
-                <span id="clock">11:41</span>
-            </div>
-            <div class="header-center">
-                <h1 class="logo-text">S E R E N I T Y</h1>
-            </div>
-            <div class="header-right">
-                <span id="mode-indicator" class="mode-capsule">NIGHT MODE</span>
-            </div>
-        </header>
-
-        <!-- Foreground Glass Grid -->
-        <section class="memory-grid" id="foreground-grid">
-            <!-- Cards injected via JS -->
-        </section>
-
-        <!-- Cinematic Footer -->
-        <footer class="cinematic-footer">
-            <button class="glass-pill">
-                See All Memories &rarr;
-            </button>
-        </footer>
-
-    </main>
-
-    <!-- Focus Overlay -->
-    <div id="focus-overlay">
-        <div class="focus-card">
-            <button class="close-btn" aria-label="Close">×</button>
-
-            <div class="focus-visual">
-                <img src="" alt="Memory">
-            </div>
-
-            <div class="focus-data">
-                <h2 class="focus-title"></h2>
-                <div class="focus-stat-line">
-                    <span class="focus-date"></span>
+            <!-- Header -->
+            <div class="vault-header">
+                <div class="logo-area">
+                    <div class="logo-icon">🕊️</div>
+                    <div class="logo-text">
+                        <h1>mnemonic</h1>
+                        <span>secure memory vault</span>
+                    </div>
                 </div>
-
-                <div class="focus-stats-container">
-                    <!-- Injected stats -->
+                <div class="header-right">
+                    <div class="memory-mood">
+                        <span class="mood-dot"></span>
+                        <span id="header-mood-text">today · nostalgic drift</span>
+                    </div>
+                    <div style="font-size:1.2rem;">🔐</div>
                 </div>
-
-                <textarea id="memory-input" class="memory-input" placeholder="Write to this memory..."></textarea>
-
-                <p id="focus-desc" class="memory-desc"></p>
             </div>
+
+            <!-- Memory Grid -->
+            <div class="memory-grid">
+                <!-- Card 1 -->
+                <div class="memory-card">
+                    <div class="card-icon">🌅</div>
+                    <div class="card-title">golden hour</div>
+                    <div class="card-desc">
+                        <span>faded photographs, sunlit laughter</span>
+                        <span style="font-size:0.75rem; color: rgba(255,255,255,0.6);">warm · protected</span>
+                    </div>
+                    <div class="floating-symbol">
+                        <span>✨</span> 4 moments
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="memory-card">
+                    <div class="card-icon">🌫️</div>
+                    <div class="card-title">distant echoes</div>
+                    <div class="card-desc">
+                        <span>blurred silhouettes, fog on glass</span>
+                        <span style="font-size:0.75rem; color: rgba(255,255,255,0.6);">quiet · preserved</span>
+                    </div>
+                    <div class="floating-symbol">
+                        <span>🌀</span> 2 fragments
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="memory-card">
+                    <div class="card-icon">🌌</div>
+                    <div class="card-title">dreamweave</div>
+                    <div class="card-desc">
+                        <span>indigo feelings, half‑remembered dreams</span>
+                        <span style="font-size:0.75rem; color: rgba(255,255,255,0.6);">deep · encoded</span>
+                    </div>
+                    <div class="floating-symbol">
+                        <span>⭐</span> 7 fragments
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Row -->
+            <div style="display: flex; gap: 1.8rem; margin-top: 0.2rem; flex-wrap: wrap;">
+                <div class="memory-card" style="flex:1; min-width: 200px;">
+                    <div class="card-icon">🌸</div>
+                    <div class="card-title">tender years</div>
+                    <div class="card-desc">
+                        <span>pastel whispers, rose beige tones</span>
+                    </div>
+                    <div class="floating-symbol">🔏 · locked</div>
+                </div>
+                <div class="memory-card" style="flex:1; min-width: 200px;">
+                    <div class="card-icon">📜</div>
+                    <div class="card-title">private archive</div>
+                    <div class="card-desc">
+                        <span>encrypted emotions, safe</span>
+                    </div>
+                    <div class="floating-symbol">🛡️ · zero‑access</div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="vault-footer">
+                <div class="security-badge">
+                    <span>🕊️</span> <span>soul‑secure encryption</span> <span style="font-size: 1rem;">🛡️</span>
+                </div>
+                <div class="time-capsule">
+                    <span class="hour-marker"></span>
+                    <span class="hour-marker" style="background: rgba(255, 200, 220, 0.6); width: 50px;"></span>
+                    <span class="hour-marker"></span>
+                    <span style="margin-left: 0.5rem;" id="timeMood">nightfall · lavender</span>
+                </div>
+                <div class="breath-hint">
+                    <span>𓇻</span> memory breathes
+                </div>
+            </div>
+            <div class="note"
+                style="text-align: center; margin-top: 1rem; color: rgba(255,255,255,0.3); font-size: 0.7rem;">every
+                color holds an emotion · vault private</div>
         </div>
     </div>
 
-    <script src="src/data.js"></script>
-    <script src="src/main.js" defer></script>
+    <script src="src/main.js"></script>
 </body>
 
 </html>
