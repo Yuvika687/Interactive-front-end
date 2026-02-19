@@ -1,284 +1,139 @@
 :root {
-    /* --- Serenity 3.0 Theme System --- */
+    /* --- Serenity Core Palette --- */
+    --bg-color: #05080F;
+    /* Deep Abyss */
 
-    /* Default: Night Mode */
-    --bg-color: #0B0F1A;
-    --accent-primary: rgba(138, 43, 226, 0.2);
-    /* Violet */
-    --card-tint: rgba(11, 15, 26, 0.4);
-    /* Dark Overlay for background cards */
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
+    /* Emotional Colors */
+    --color-happy: #F0B27A;
+    --color-bittersweet: #B784A7;
+    --color-grief: #5D6D7E;
+    --color-peaceful: #76D7C4;
+    --color-nostalgic: #B97C4B;
+    --color-loved: #6C3483;
 
-    /* Glass UI - Higher Transparency for 3.0 */
-    --glass-bg: rgba(11, 15, 26, 0.2);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-blur: 20px;
-    --glass-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+    /* UI Glass */
+    --glass-bg: rgba(20, 25, 40, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 24px;
 
-    --font-main: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-    --ease-fluid: cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-
-/* Theme Classes applied to Body */
-body.morning {
-    --bg-color: #1A2340;
-    /* Indigo/Purple transition */
-    --accent-primary: rgba(255, 182, 193, 0.2);
-    /* Warm Rose */
-    --card-tint: rgba(26, 35, 64, 0.3);
-}
-
-body.day {
-    --bg-color: #2F4F4F;
-    /* Muted Teal Base */
-    --accent-primary: rgba(175, 238, 238, 0.2);
-    --card-tint: rgba(47, 79, 79, 0.2);
-}
-
-body.golden {
-    --bg-color: #3b2f2f;
-    /* Deep Sepia */
-    --accent-primary: rgba(255, 215, 0, 0.15);
-    /* Amber */
-    --card-tint: rgba(60, 40, 0, 0.3);
-}
-
-/* Base */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 body {
     margin: 0;
     height: 100vh;
     overflow: hidden;
-    /* Universe handles scoll */
     background-color: var(--bg-color);
-    color: var(--text-primary);
-    font-family: var(--font-main);
-    transition: background-color 2s ease;
+    font-family: "SF Pro Display", "Inter", sans-serif;
+    color: white;
+    user-select: none;
+    /* Immersive */
 }
 
-/* --- Memory Universe (Background) --- */
+/* --- The Universe --- */
 #memory-universe {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
+    inset: 0;
     perspective: 1000px;
+    transform-style: preserve-3d;
+    /* Critical for 3D layers */
     overflow: hidden;
-    pointer-events: none;
-    /* Let clicks pass to UI usually, but maybe we want interaction? For now background is ambient. */
+    /* We will move the camera (universe container) or move items? 
+       Moving items is easier for "Infinite" feel if we wrap them. */
 }
 
-.universe-card {
+.memory-node {
     position: absolute;
     background-size: cover;
     background-position: center;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    /* Soft squares */
     will-change: transform, opacity;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: box-shadow 0.4s ease, filter 0.4s ease, transform 0.8s var(--ease-out);
 }
 
-.universe-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: var(--card-tint);
-    border-radius: 24px;
+/* Interaction States */
+.memory-node:hover {
+    z-index: 9999 !important;
+    /* Bring to front of its local layer context if possible, but strict z-index might fight 3D. */
+    /* Actually with translate3d z-axis, z-index is less relevant unless coplanar. 
+       We'll rely on scale and brightness. */
+    filter: brightness(1.2);
+    box-shadow: 0 0 20px var(--glow-color, rgba(255, 255, 255, 0.2));
 }
 
-/* --- Main UI Layer --- */
+/* Layers - CSS helper classes (though mostly handled in JS via inline styles) */
+.layer-abyss {
+    filter: grayscale(0.8) brightness(0.4);
+    pointer-events: none;
+}
+
+.layer-reflection {
+    filter: grayscale(0.4) brightness(0.6);
+}
+
+.layer-nostalgia {
+    filter: sepia(0.3) brightness(0.8);
+}
+
+.layer-recent {
+    filter: brightness(0.9);
+}
+
+.layer-present {
+    filter: brightness(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* --- UI Overlay --- */
 #app {
-    position: relative;
-    z-index: 1000;
-    /* Float above universe */
-    height: 100%;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10000;
     display: flex;
     flex-direction: column;
     padding: 2rem;
-    pointer-events: none;
-    /* Allow pass-through to background logic if needed, but UI elements need events */
 }
 
-/* Re-enable pointer events for interactive elements */
-header,
-.featured-container,
-.see-all-pill {
+header {
     pointer-events: auto;
-}
-
-/* Status Bar */
-.status-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2rem;
-    height: 60px;
-    border-radius: 999px;
-
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-
-    margin-bottom: auto;
-    /* Push content down */
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
 }
 
-.brand .logo-text {
-    font-weight: 200;
-    letter-spacing: 0.5em;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-}
-
-.system-status {
-    display: flex;
-    gap: 2rem;
-    font-size: 0.85rem;
+.brand {
     font-weight: 300;
-    opacity: 0.9;
-}
-
-/* Featured Layout */
-.featured-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4rem;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-#featured-card {
-    width: 400px;
-    height: 500px;
-    border-radius: 32px;
-    position: relative;
-    transition: transform 0.4s var(--ease-fluid);
-}
-
-/* Reuse glass style for featured but make it pop */
-.feature-glass {
-    width: 100%;
-    height: 100%;
-    border-radius: 32px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-}
-
-.feature-img {
-    width: 100%;
-    flex: 1;
-    object-fit: cover;
-    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-}
-
-.feature-info {
-    padding: 2rem;
-    margin-top: -80px;
-    /* Overlap mask */
-    z-index: 2;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.feature-title {
-    font-size: 2rem;
-    font-weight: 300;
-    letter-spacing: -0.02em;
-}
-
-.feature-date {
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
+    letter-spacing: 0.2rem;
     opacity: 0.8;
 }
 
-/* Secondary Grid for layout */
-#secondary-grid {
+.hud {
     display: flex;
-    flex-direction: column;
     gap: 2rem;
+    font-size: 0.85rem;
+    opacity: 0.6;
 }
 
-.mini-card {
-    width: 180px;
-    height: 120px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: flex-end;
-    padding: 1rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-}
-
-.mini-card:hover {
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.15);
-}
-
-/* Bottom Pill */
-.see-all-pill {
-    margin: 3rem auto 2rem;
-    padding: 1rem 3rem;
-    background: var(--glass-bg);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid var(--glass-border);
-    border-radius: 999px;
-    color: #fff;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.see-all-pill:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.15);
-}
-
-/* Focus Overlay */
+/* --- Focus Overlay --- */
 #focus-overlay {
     position: fixed;
     inset: 0;
-    z-index: 2000;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(30px);
+    background: rgba(5, 8, 15, 0.9);
+    /* Deep backing */
+    backdrop-filter: blur(40px);
+    z-index: 20000;
     display: flex;
     align-items: center;
+    /* Center vertically */
     justify-content: center;
+    /* Center horizontally */
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.6s ease;
 }
 
 #focus-overlay.active {
@@ -287,78 +142,79 @@ header,
 }
 
 .focus-card {
-    width: 90%;
-    max-width: 1000px;
-    height: 80vh;
-    position: relative;
+    width: 60vw;
+    height: 70vh;
+    max-width: 1200px;
+    background: transparent;
     display: flex;
-    background: rgba(20, 20, 20, 0.4);
-    border-radius: 32px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-}
-
-.focus-content {
-    display: flex;
-    width: 100%;
-}
-
-.media-container {
-    flex: 2;
-    display: flex;
+    gap: 4rem;
     align-items: center;
-    justify-content: center;
-    background: black;
 }
 
-.media-container img {
-    max-width: 100%;
-    max-height: 100%;
+.focus-visual {
+    flex: 1.5;
+    height: 100%;
+    border-radius: 4px;
+    /* Cinematic sharpish corners */
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.focus-visual img {
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    /* Show full image */
 }
 
-.meta-data {
+.focus-data {
     flex: 1;
-    padding: 3rem;
+    color: white;
+}
+
+.focus-title {
+    font-size: 3rem;
+    font-weight: 200;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.focus-date {
+    font-size: 0.9rem;
+    opacity: 0.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+}
+
+.focus-stat {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.02);
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+    font-weight: 300;
 }
 
-.icon-btn {
+.focus-stat b {
+    font-weight: 500;
+    color: var(--color-gold, #F7DC6F);
+}
+
+.close-btn {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    top: 2rem;
+    right: 2rem;
+    background: none;
     border: none;
-    color: #fff;
-    font-size: 1.5rem;
+    color: white;
+    font-size: 2rem;
     cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
 }
 
-@media (max-width: 768px) {
-    .featured-container {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    #secondary-grid {
-        flex-direction: row;
-        overflow-x: auto;
-        max-width: 100%;
-    }
-
-    .focus-content {
-        flex-direction: column;
-    }
-
-    .meta-data {
-        width: 100%;
-        height: auto;
-    }
+.close-btn:hover {
+    opacity: 1;
 }

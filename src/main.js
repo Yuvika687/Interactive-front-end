@@ -1,195 +1,221 @@
-// --- Data Configuration ---
-const MEMORIES = [
-    { id: 1, title: "Solis", date: "Aug 14, 2024", desc: "Morning light.", src: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=600&auto=format&fit=crop" },
-    { id: 2, title: "Azure Deep", date: "Sep 02, 2024", desc: "Deep ocean silence.", src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop" },
-    { id: 3, title: "Night Walk", date: "Nov 12, 2024", desc: "City rain reflections.", src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=600&auto=format&fit=crop" },
-    { id: 4, title: "Nebula", date: "Dec 31, 2024", desc: "Neon clouds.", src: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=600&auto=format&fit=crop" },
-    { id: 5, title: "Alpine", date: "Jan 10, 2025", desc: "Mountain peak.", src: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=600&auto=format&fit=crop" },
-    { id: 6, title: "Glass House", date: "Feb 05, 2025", desc: "Botanical time capsule.", src: "https://images.unsplash.com/photo-1466781783364-36c955e42a7f?q=80&w=600&auto=format&fit=crop" },
-    { id: 7, title: "Canyon", date: "Mar 12, 2025", desc: "Red dust.", src: "https://images.unsplash.com/photo-1474044158699-59270e99d264?q=80&w=600&auto=format&fit=crop" },
-    { id: 8, title: "Forest", date: "Apr 22, 2025", desc: "Green canopy.", src: "https://images.unsplash.com/photo-1448375240586-dfd8d395ea6c?q=80&w=600&auto=format&fit=crop" }
-];
+/**
+ * SERENITY ENGINE v1.0
+ * Handles the Living Memory Universe
+ */
+
+// --- Configuration ---
+const CONFIG = {
+    mouseInfluence: 0.05, // How much cursor affects drift
+    zoomLevel: 1000, // Initial Z start
+    maxDepth: 1000,
+    interactionDist: 100
+};
 
 // --- State ---
 const state = {
-    particles: [],
-    frameCount: 0
+    memories: [],
+    activeMemory: null,
+    mouseX: window.innerWidth / 2,
+    mouseY: window.innerHeight / 2,
+    isHovering: false,
+    hoverTarget: null
 };
 
-// --- DOM ---
+// --- DOM Cache ---
 const dom = {
     universe: document.getElementById('memory-universe'),
-    featured: document.getElementById('featured-card'),
-    secondary: document.getElementById('secondary-grid'),
-    clock: document.getElementById('clock'),
-    mode: document.getElementById('mode-indicator'),
     overlay: document.getElementById('focus-overlay'),
-    focusMedia: document.getElementById('focus-media'),
-    focusTitle: document.getElementById('focus-title'),
-    focusDate: document.getElementById('focus-date'),
-    focusDesc: document.getElementById('focus-desc'),
-    closeBtn: document.getElementById('close-focus')
+    // Focus Elements
+    focusImg: document.querySelector('.focus-visual img'),
+    focusTitle: document.querySelector('.focus-title'),
+    focusDate: document.querySelector('.focus-date'),
+    focusStats: document.querySelector('.focus-stats-container'), // We need to inject stats here
+    closeBtn: document.querySelector('.close-btn'),
+    // HUD
+    clock: document.getElementById('clock'),
+    mode: document.getElementById('mode-indicator')
 };
 
-// --- Init ---
+// --- Initialization ---
 function init() {
-    generateUniverse();
-    renderUI();
-    startTimeSystem();
-    animateUniverse();
+    // 1. Generate Data
+    if (!window.SerenityData) {
+        console.error("SerenityData not loaded");
+        return;
+    }
+
+    const rawData = window.SerenityData.generateMemoryData();
+
+    // 2. Create DOM Nodes & Internal Objects
+    state.memories = rawData.map(data => createMemoryNode(data));
+
+    // 3. Mount to DOM
+    // Use a document fragment for performance
+    const fragment = document.createDocumentFragment();
+    state.memories.forEach(m => fragment.appendChild(m.el));
+    dom.universe.appendChild(fragment);
+
+    // 4. Start Events & Loop
     setupEvents();
+    requestAnimationFrame(loop);
+
+    // 5. Time System
+    startTimeSystem();
 }
 
-// --- Memory Universe System ---
-function generateUniverse() {
-    const COUNT = 100;
+function createMemoryNode(data) {
+    const el = document.createElement('div');
+    el.className = `memory-node layer-${data.layer}`;
+    el.style.backgroundImage = `url(${data.src})`;
+    el.style.width = `${data.baseSize}px`;
+    el.style.height = `${data.baseSize * 1.2}px`; // Portrait aspect
 
-    for (let i = 0; i < COUNT; i++) {
-        const memory = MEMORIES[Math.floor(Math.random() * MEMORIES.length)];
-        const el = document.createElement('div');
-        el.className = 'universe-card';
-        el.style.backgroundImage = `url(${memory.src})`;
+    // Custom properties for logic
+    // We store visual position separate from data position to allow smooth interpolation if needed
+    const node = {
+        data: data,
+        el: el,
+        x: data.x,
+        y: data.y,
+        z: data.z, // Depth
+        vx: data.driftSpeed.x,
+        vy: data.driftSpeed.y,
+        hovered: false
+    };
 
-        // Config based on layers
-        // 0-50: Deep (Slow, Transparent)
-        // 50-80: Mid (Medium)
-        // 80-100: Surface (Fast, Visible)
+    // Store reference on element for event delegation
+    el.dataset.id = data.id;
 
-        let layer = 'deep';
-        let size, opacity, speed;
+    return node;
+}
 
-        if (i < 50) {
-            layer = 'deep'; size = rnd(200, 300); opacity = 0.15; speed = 0.1;
-        } else if (i < 80) {
-            layer = 'mid'; size = rnd(150, 200); opacity = 0.25; speed = 0.3;
-        } else {
-            layer = 'surface'; size = rnd(100, 150); opacity = 0.4; speed = 0.6;
+// --- The Physics Loop ---
+function loop() {
+    // Center point
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+
+    state.memories.forEach(node => {
+        // 1. Apply Drift
+        if (!state.activeMemory && !node.hovered) {
+            node.x += node.vx;
+            node.y += node.vy;
+
+            // Wrap around logic (Infinite Universe)
+            const bounds = 2500; // Match generation spread
+            if (node.x > bounds) node.x = -bounds;
+            if (node.x < -bounds) node.x = bounds;
+            if (node.y > bounds) node.y = -bounds;
+            if (node.y < -bounds) node.y = bounds;
         }
 
-        const x = Math.random() * window.innerWidth;
-        const y = Math.random() * window.innerHeight;
+        // 2. Mouse Parallax (The "Look" effect)
+        // Deeper memories move less than surface ones (Parallax)
+        // Z goes from -500 (deep) to 100 (surface)
+        // Factor: Surface=1, Deep=0.1
+        const depthFactor = (node.z + 500) / 600;
+        const mx = (state.mouseX - cx) * 0.05 * depthFactor;
+        const my = (state.mouseY - cy) * 0.05 * depthFactor;
 
-        el.style.width = `${size}px`;
-        el.style.height = `${size * 1.2}px`; // Aspect ratio
-        el.style.opacity = opacity;
+        // 3. Render
+        // We use translate3d for hardware accel
+        // We add the 'mx' directly to the transform, not the permanent XY
+        const renderX = node.x + mx;
+        const renderY = node.y + my;
 
-        // Store Particle Data
-        state.particles.push({
-            el,
-            x, y,
-            speedX: (Math.random() - 0.5) * speed,
-            speedY: (Math.random() - 0.5) * speed,
-            rot: Math.random() * 10 - 5
-        });
-
-        // Initial Move
-        el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${Math.random() * 10 - 5}deg)`;
-
-        dom.universe.appendChild(el);
-    }
-}
-
-function animateUniverse() {
-    state.particles.forEach(p => {
-        p.x += p.speedX;
-        p.y += p.speedY;
-
-        // Wrap around
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        const padding = 200;
-
-        if (p.x < -padding) p.x = w + padding;
-        if (p.x > w + padding) p.x = -padding;
-        if (p.y < -padding) p.y = h + padding;
-        if (p.y > h + padding) p.y = -padding;
-
-        p.el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotate(${p.rot}deg)`;
+        node.el.style.transform = `translate3d(${renderX.toFixed(1)}px, ${renderY.toFixed(1)}px, ${node.z}px)`;
     });
 
-    requestAnimationFrame(animateUniverse);
+    requestAnimationFrame(loop);
 }
 
-// --- UI Rendering ---
-function renderUI() {
-    // Featured Card (Top Memory)
-    const feat = MEMORIES[1]; // Azure Deep
-    dom.featured.innerHTML = `
-    <article class="feature-glass" onclick="openMemory(${feat.id})">
-       <img src="${feat.src}" class="feature-img">
-       <div class="feature-info">
-          <h2 class="feature-title">${feat.title}</h2>
-          <p class="feature-date">${feat.date}</p>
-       </div>
-    </article>
-  `;
+// --- Interaction ---
+function setupEvents() {
+    // Mouse Move
+    window.addEventListener('mousemove', e => {
+        state.mouseX = e.clientX;
+        state.mouseY = e.clientY;
+    });
 
-    // Secondary Cards
-    const sec = [MEMORIES[2], MEMORIES[3]];
-    dom.secondary.innerHTML = sec.map(m => `
-    <div class="mini-card" onclick="openMemory(${m.id})">
-       <div>
-         <strong>${m.title}</strong><br>
-         <span style="opacity:0.6">${m.date}</span>
-       </div>
-    </div>
-  `).join('');
+    // Delegation for Hover/Click
+    // Doing per-node listeners is expensive for 1000 nodes, 
+    // but `mouseenter`/`mouseleave` don't bubble.
+    // However, we used standard :hover CSS for the basic glow. 
+    // For Logic (pausing drift), we can use mouseover on the container.
+
+    dom.universe.addEventListener('mouseover', e => {
+        if (e.target.classList.contains('memory-node')) {
+            const id = e.target.dataset.id;
+            const node = state.memories.find(m => m.data.id == id);
+            if (node) {
+                node.hovered = true;
+                state.hoverTarget = node;
+                // Optional: Update HUD with memory details?
+            }
+        }
+    });
+
+    dom.universe.addEventListener('mouseout', e => {
+        if (e.target.classList.contains('memory-node')) {
+            const id = e.target.dataset.id;
+            const node = state.memories.find(m => m.data.id == id);
+            if (node) {
+                node.hovered = false;
+                state.hoverTarget = null;
+            }
+        }
+    });
+
+    // Click to Open
+    dom.universe.addEventListener('click', e => {
+        if (e.target.classList.contains('memory-node')) {
+            const id = e.target.dataset.id;
+            openMemory(id);
+        }
+    });
+
+    // Close
+    dom.closeBtn.addEventListener('click', closeMemory);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeMemory();
+    });
+}
+
+function openMemory(id) {
+    const node = state.memories.find(m => m.data.id == id);
+    if (!node) return;
+
+    state.activeMemory = node;
+
+    // Populate Overlay
+    dom.focusImg.src = node.data.src;
+    dom.focusTitle.textContent = "Memory " + node.data.id; // Placeholder title
+    dom.focusDate.textContent = node.data.created.toDateString();
+
+    // Show
+    dom.overlay.classList.add('active');
+}
+
+function closeMemory() {
+    dom.overlay.classList.remove('active');
+    state.activeMemory = null;
 }
 
 // --- Time System ---
 function startTimeSystem() {
     const update = () => {
         const now = new Date();
-        // Clock
         dom.clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // Themes
+        // Simple mock mode logic (can be expanded)
         const h = now.getHours();
-        let theme = 'night';
-        let label = 'Night Mode';
-
-        if (h >= 6 && h < 10) { theme = 'morning'; label = 'Morning Mode'; }
-        else if (h >= 10 && h < 16) { theme = 'day'; label = 'Day Mode'; }
-        else if (h >= 16 && h < 18) { theme = 'golden'; label = 'Golden Hour'; }
-        else { theme = 'night'; label = 'Night Mode'; }
-
-        document.body.className = theme;
+        let label = "Night Mode";
+        if (h > 6 && h < 18) label = "Day Mode";
         dom.mode.textContent = label;
     };
-
+    setInterval(update, 1000);
     update();
-    setInterval(update, 60000); // Check every minute
 }
-
-// --- Interaction ---
-window.openMemory = (id) => {
-    const m = MEMORIES.find(x => x.id === id);
-    if (!m) return;
-
-    dom.focusTitle.innerText = m.title;
-    dom.focusDate.innerText = m.date;
-    dom.focusDesc.innerText = m.desc;
-    dom.focusMedia.innerHTML = `<img src="${m.src}">`;
-
-    dom.overlay.classList.remove('hidden');
-    // Tick to allow transition
-    requestAnimationFrame(() => dom.overlay.classList.add('active'));
-};
-
-function setupEvents() {
-    dom.closeBtn.onclick = () => {
-        dom.overlay.classList.remove('active');
-        setTimeout(() => dom.overlay.classList.add('hidden'), 400);
-    };
-
-    // Quick escape
-    document.onkeydown = (e) => {
-        if (e.key === 'Escape') dom.closeBtn.click();
-    };
-}
-
-// Helper
-function rnd(min, max) { return Math.random() * (max - min) + min; }
 
 // Run
 init();
