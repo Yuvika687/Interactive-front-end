@@ -1,0 +1,364 @@
+:root {
+    /* --- Serenity 3.0 Theme System --- */
+
+    /* Default: Night Mode */
+    --bg-color: #0B0F1A;
+    --accent-primary: rgba(138, 43, 226, 0.2);
+    /* Violet */
+    --card-tint: rgba(11, 15, 26, 0.4);
+    /* Dark Overlay for background cards */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+
+    /* Glass UI - Higher Transparency for 3.0 */
+    --glass-bg: rgba(11, 15, 26, 0.2);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: 20px;
+    --glass-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+
+    --font-main: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    --ease-fluid: cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+/* Theme Classes applied to Body */
+body.morning {
+    --bg-color: #1A2340;
+    /* Indigo/Purple transition */
+    --accent-primary: rgba(255, 182, 193, 0.2);
+    /* Warm Rose */
+    --card-tint: rgba(26, 35, 64, 0.3);
+}
+
+body.day {
+    --bg-color: #2F4F4F;
+    /* Muted Teal Base */
+    --accent-primary: rgba(175, 238, 238, 0.2);
+    --card-tint: rgba(47, 79, 79, 0.2);
+}
+
+body.golden {
+    --bg-color: #3b2f2f;
+    /* Deep Sepia */
+    --accent-primary: rgba(255, 215, 0, 0.15);
+    /* Amber */
+    --card-tint: rgba(60, 40, 0, 0.3);
+}
+
+/* Base */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    /* Universe handles scoll */
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    transition: background-color 2s ease;
+}
+
+/* --- Memory Universe (Background) --- */
+#memory-universe {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    perspective: 1000px;
+    overflow: hidden;
+    pointer-events: none;
+    /* Let clicks pass to UI usually, but maybe we want interaction? For now background is ambient. */
+}
+
+.universe-card {
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    will-change: transform, opacity;
+}
+
+.universe-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--card-tint);
+    border-radius: 24px;
+}
+
+/* --- Main UI Layer --- */
+#app {
+    position: relative;
+    z-index: 1000;
+    /* Float above universe */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    pointer-events: none;
+    /* Allow pass-through to background logic if needed, but UI elements need events */
+}
+
+/* Re-enable pointer events for interactive elements */
+header,
+.featured-container,
+.see-all-pill {
+    pointer-events: auto;
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    height: 60px;
+    border-radius: 999px;
+
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+
+    margin-bottom: auto;
+    /* Push content down */
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.brand .logo-text {
+    font-weight: 200;
+    letter-spacing: 0.5em;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.system-status {
+    display: flex;
+    gap: 2rem;
+    font-size: 0.85rem;
+    font-weight: 300;
+    opacity: 0.9;
+}
+
+/* Featured Layout */
+.featured-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+#featured-card {
+    width: 400px;
+    height: 500px;
+    border-radius: 32px;
+    position: relative;
+    transition: transform 0.4s var(--ease-fluid);
+}
+
+/* Reuse glass style for featured but make it pop */
+.feature-glass {
+    width: 100%;
+    height: 100%;
+    border-radius: 32px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-img {
+    width: 100%;
+    flex: 1;
+    object-fit: cover;
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.feature-info {
+    padding: 2rem;
+    margin-top: -80px;
+    /* Overlap mask */
+    z-index: 2;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.feature-title {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+}
+
+.feature-date {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+}
+
+/* Secondary Grid for layout */
+#secondary-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.mini-card {
+    width: 180px;
+    height: 120px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.mini-card:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Bottom Pill */
+.see-all-pill {
+    margin: 3rem auto 2rem;
+    padding: 1rem 3rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.see-all-pill:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Focus Overlay */
+#focus-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(30px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+#focus-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.focus-card {
+    width: 90%;
+    max-width: 1000px;
+    height: 80vh;
+    position: relative;
+    display: flex;
+    background: rgba(20, 20, 20, 0.4);
+    border-radius: 32px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+}
+
+.focus-content {
+    display: flex;
+    width: 100%;
+}
+
+.media-container {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: black;
+}
+
+.media-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.meta-data {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.icon-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .featured-container {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    #secondary-grid {
+        flex-direction: row;
+        overflow-x: auto;
+        max-width: 100%;
+    }
+
+    .focus-content {
+        flex-direction: column;
+    }
+
+    .meta-data {
+        width: 100%;
+        height: auto;
+    }
+}

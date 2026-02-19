@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S E R E N I T Y • Memory OS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/style.css">
+</head>
+
+<body>
+    <!-- Memory Universe (Background System) -->
+    <div id="memory-universe"></div>
+
+    <!-- Main UI Layer (Floating) -->
+    <main id="app">
+
+        <!-- Minimal Floating Header -->
+        <header class="glass-panel status-bar">
+            <div class="brand">
+                <span class="logo-text">S E R E N I T Y</span>
+            </div>
+            <div class="system-status">
+                <span id="clock" class="time-display">00:00</span>
+                <span id="mode-indicator" class="mode-tag">Night Mode</span>
+                <span class="menu-trigger">⋯</span>
+            </div>
+        </header>
+
+        <!-- Featured Memory Layout -->
+        <section class="featured-container">
+            <!-- Central Hero Card -->
+            <div id="featured-card">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Secondary Cards (Floating nearby) -->
+            <div id="secondary-grid">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- Bottom Floating Pill -->
+        <button class="see-all-pill">
+            See All Memories &rarr;
+        </button>
+
+    </main>
+
+    <!-- Focus Overlay -->
+    <div id="focus-overlay" class="hidden">
+        <div class="glass-panel focus-card">
+            <button id="close-focus" class="icon-btn" aria-label="Close">×</button>
+            <div class="focus-content">
+                <div class="media-container" id="focus-media"></div>
+                <div class="meta-data">
+                    <h2 id="focus-title"></h2>
+                    <p id="focus-date" class="date-stamp"></p>
+                    <p id="focus-desc" class="memory-desc"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/main.js" defer></script>
+</body>
+
+</html>
