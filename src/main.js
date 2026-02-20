@@ -46,10 +46,10 @@ function initCanvasSky() {
         stars.push({
             x: Math.random() * width,
             y: Math.random() * height,
-            z: Math.random() * 2 + 0.1, // Depth parallax
-            opacity: Math.random(),
-            twinkleSpeed: Math.random() * 0.02 + 0.005,
-            color: Math.random() > 0.8 ? '#e8f0ff' : (Math.random() > 0.6 ? '#ffe4d6' : '#ffffff')
+            z: Math.random() * 5 + 0.5, // Deeper parallax for smaller stars
+            opacity: Math.pow(Math.random(), 3), // Exponential curve: 90% of stars are very faint
+            twinkleSpeed: Math.random() * 0.01 + 0.002,
+            color: Math.random() > 0.8 ? '#e8f0ff' : (Math.random() > 0.7 ? '#ffe4d6' : '#ffffff')
         });
     }
 
@@ -62,17 +62,17 @@ function initCanvasSky() {
 
         for (let star of stars) {
             // Earth rotation / air movement
-            star.x -= 0.08 / star.z;
+            star.x -= 0.04 / star.z;
             if (star.x < 0) star.x = width;
 
             // Twinkle
-            let currentOpacity = star.opacity + Math.sin(time * star.twinkleSpeed) * 0.2;
+            let currentOpacity = star.opacity + Math.sin(time * star.twinkleSpeed) * 0.15;
             if (currentOpacity < 0) currentOpacity = 0;
             if (currentOpacity > 1) currentOpacity = 1;
 
-            // SMALLER STARS: Microscopic pinpricks
-            let radius = (0.5 / star.z);
-            if (radius < 0.1) radius = 0.1;
+            // ULTRA SMALL STARS
+            let radius = (0.35 / star.z);
+            if (radius < 0.05) radius = 0.05;
 
             ctx.beginPath();
             ctx.arc(star.x, star.y, radius, 0, Math.PI * 2);
@@ -80,12 +80,12 @@ function initCanvasSky() {
             ctx.globalAlpha = currentOpacity;
             ctx.fill();
 
-            // Halo for very close stars - smaller halo
-            if (star.z < 0.3 && currentOpacity > 0.8) {
+            // Halo only for the extremely rare, close, and bright stars
+            if (star.z < 1.0 && currentOpacity > 0.8) {
                 ctx.beginPath();
-                ctx.arc(star.x, star.y, 1.5, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, 1.5);
-                grad.addColorStop(0, `rgba(255,255,255,${currentOpacity * 0.3})`);
+                ctx.arc(star.x, star.y, 1.2, 0, Math.PI * 2);
+                const grad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, 1.2);
+                grad.addColorStop(0, `rgba(255,255,255,${currentOpacity * 0.15})`);
                 grad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = grad;
                 ctx.fill();
