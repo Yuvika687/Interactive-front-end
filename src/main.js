@@ -18,55 +18,111 @@ function initMnemonic() {
     updateMood();
     setInterval(updateMood, 60000); // Check every minute
 
-    // Generate photorealistic stars
-    generateStars();
+    // Build 4K Photorealistic Canvas Sky
+    initCanvasSky();
 }
 
-function generateStars() {
-    const atmo = document.querySelector('.memory-atmosphere');
-    if (!atmo) return;
+function initCanvasSky() {
+    const canvas = document.getElementById('star-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-    // Remove old constellation if it exists
-    const oldConst = document.querySelector('.constellation');
-    if (oldConst) oldConst.remove();
+    let width, height;
+    const stars = [];
+    const numStars = 2500; // Ultra high density for 4K realism
 
-    const starContainer = document.createElement('div');
-    starContainer.className = 'real-starfield';
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-    for (let i = 0; i < 350; i++) {
-        const star = document.createElement('div');
-        star.className = 'real-star';
-
-        const x = Math.random() * 100;
-        const y = Math.random() * 100;
-        const size = Math.random() < 0.95 ? (Math.random() * 1.5 + 0.5) : (Math.random() * 3 + 1.5);
-        const opacity = Math.random() * 0.8 + 0.1;
-        const duration = Math.random() * 4 + 2;
-
-        star.style.left = `${x}%`;
-        star.style.top = `${y}%`;
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        star.style.opacity = opacity;
-        star.style.animationDuration = `${duration}s`;
-        star.style.animationDelay = `${Math.random() * 5}s`;
-
-        const colors = ['#ffffff', '#e8f0ff', '#f0f5ff', '#fff0e5', '#ffffff'];
-        star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-
-        // Big stars get a subtle glow
-        if (size > 2.5) {
-            star.style.boxShadow = `0 0 ${size * 2}px ${star.style.backgroundColor}`;
-            star.style.borderRadius = '50%';
-        } else {
-            // Very tiny stars can just be square chunks rendered as dots
-            star.style.borderRadius = '50%';
-        }
-
-        starContainer.appendChild(star);
+    for (let i = 0; i < numStars; i++) {
+        stars.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            z: Math.random() * 2 + 0.1, // Depth parallax
+            opacity: Math.random(),
+            twinkleSpeed: Math.random() * 0.02 + 0.005,
+            color: Math.random() > 0.8 ? '#e8f0ff' : (Math.random() > 0.6 ? '#ffe4d6' : '#ffffff')
+        });
     }
 
-    atmo.appendChild(starContainer);
+    let shootingStars = [];
+    let time = 0;
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        time += 1;
+
+        for (let star of stars) {
+            // Earth rotation / air movement
+            star.x -= 0.08 / star.z;
+            if (star.x < 0) star.x = width;
+
+            // Twinkle
+            let currentOpacity = star.opacity + Math.sin(time * star.twinkleSpeed) * 0.2;
+            if (currentOpacity < 0) currentOpacity = 0;
+            if (currentOpacity > 1) currentOpacity = 1;
+
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, (1.2 / star.z), 0, Math.PI * 2);
+            ctx.fillStyle = star.color;
+            ctx.globalAlpha = currentOpacity;
+            ctx.fill();
+
+            // Halo for very close stars
+            if (star.z < 0.3 && currentOpacity > 0.8) {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, 4, 0, Math.PI * 2);
+                const grad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, 4);
+                grad.addColorStop(0, `rgba(255,255,255,${currentOpacity * 0.4})`);
+                grad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = grad;
+                ctx.fill();
+            }
+        }
+
+        ctx.globalAlpha = 1;
+
+        // Occasional shooting star
+        if (Math.random() < 0.002 && shootingStars.length < 2) {
+            shootingStars.push({
+                x: Math.random() * width,
+                y: 0,
+                len: Math.random() * 80 + 20,
+                speed: Math.random() * 10 + 15,
+                angle: Math.PI / 4 + Math.random() * 0.2,
+                opacity: 1
+            });
+        }
+
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+            let ss = shootingStars[i];
+            ctx.beginPath();
+            ctx.moveTo(ss.x, ss.y);
+            ctx.lineTo(ss.x - Math.cos(ss.angle) * ss.len, ss.y - Math.sin(ss.angle) * ss.len);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${ss.opacity})`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ss.x += Math.cos(ss.angle) * ss.speed;
+            ss.y += Math.sin(ss.angle) * ss.speed;
+            ss.opacity -= 0.02;
+
+            if (ss.opacity <= 0) {
+                shootingStars.splice(i, 1);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+    animate();
 }
 
 function cycleManualTheme() {
@@ -81,65 +137,60 @@ function updateMood() {
     const timeMoodEl = document.getElementById('timeMood');
     const headerMoodEl = document.getElementById('header-mood-text');
     const gradientLayer = document.querySelector('.atmo-gradient');
-    const clouds = document.querySelectorAll('.cloud');
     const toggleBtn = document.getElementById('theme-toggle');
 
-    // Simulate time (or get real time)
     const now = new Date();
     const hour = now.getHours();
-
     let mood = {};
-
-    // Determine Index: either Manual or Time-based
     let themeIndex = 0;
 
     if (manualOverrideIndex !== -1) {
-        // MANUAL MODE
         themeIndex = manualOverrideIndex;
         if (toggleBtn) toggleBtn.innerText = ["Theme: Dawn", "Theme: Day", "Theme: Golden", "Theme: Night"][themeIndex];
     } else {
-        // AUTOMATIC MODE
         if (toggleBtn) toggleBtn.innerText = "Change Theme (Auto)";
 
-        if (hour >= 5 && hour < 10) themeIndex = 0;      // Dawn
-        else if (hour >= 10 && hour < 17) themeIndex = 1; // Day
-        else if (hour >= 17 && hour < 20) themeIndex = 2; // Golden
-        else themeIndex = 3;                              // Night
+        if (hour >= 5 && hour < 10) themeIndex = 0;
+        else if (hour >= 10 && hour < 17) themeIndex = 1;
+        else if (hour >= 17 && hour < 20) themeIndex = 2;
+        else themeIndex = 3;
     }
 
-    // Apply Theme Stats
     switch (themeIndex) {
         case 0: // Dawn
             mood = {
                 text: 'dawn · misty peach',
                 gradient: 'linear-gradient(180deg, #0b1021 0%, #1a2035 50%, #3d3040 100%)',
-                cloudTint: 'rgba(200, 160, 150, 0.25)'
+                canvasOpacity: '0.4',
+                auroraGradient: 'radial-gradient(ellipse at center, rgba(255, 180, 150, 0.1) 0%, transparent 60%)'
             };
             break;
         case 1: // Day
             mood = {
                 text: 'day · pale azure',
                 gradient: 'linear-gradient(180deg, #101a30 0%, #203550 50%, #355070 100%)',
-                cloudTint: 'rgba(180, 200, 220, 0.25)'
+                canvasOpacity: '0.1',
+                auroraGradient: 'radial-gradient(ellipse at center, rgba(180, 200, 255, 0.05) 0%, transparent 60%)'
             };
             break;
         case 2: // Golden Hour
             mood = {
                 text: 'golden hour · deep embers',
                 gradient: 'linear-gradient(180deg, #080c18 0%, #151828 50%, #302025 100%)',
-                cloudTint: 'rgba(180, 140, 120, 0.25)'
+                canvasOpacity: '0.6',
+                auroraGradient: 'radial-gradient(ellipse at center, rgba(255, 120, 80, 0.08) 0%, transparent 60%)'
             };
             break;
         case 3: // Night
             mood = {
                 text: 'night · cinematic deep space',
                 gradient: 'linear-gradient(180deg, #02030a 0%, #050b1c 45%, #0c1330 100%)',
-                cloudTint: 'rgba(30, 45, 90, 0.15)' // subtle cool blue-indigo tint
+                canvasOpacity: '1.0',
+                auroraGradient: 'radial-gradient(ellipse at 40% 60%, rgba(80, 120, 255, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 30%, rgba(200, 100, 255, 0.05) 0%, transparent 50%)'
             };
             break;
     }
 
-    // 2. Apply Changes
     if (timeMoodEl) timeMoodEl.innerText = mood.text;
     if (headerMoodEl) headerMoodEl.innerText = mood.text;
 
@@ -147,12 +198,15 @@ function updateMood() {
         gradientLayer.style.background = mood.gradient;
     }
 
-    // Tint Clouds - Using radial-gradient directly so the SVG filter distorts a gradient mass, avoiding hard box edges
-    clouds.forEach(cloud => {
-        cloud.style.background = `radial-gradient(ellipse at center, ${mood.cloudTint} 0%, transparent 65%)`;
-    });
+    const canvas = document.getElementById('star-canvas');
+    if (canvas) {
+        canvas.style.opacity = mood.canvasOpacity;
+    }
 
-    document.documentElement.style.setProperty('--cloud-color', mood.cloudTint);
+    const aurora = document.getElementById('aurora-layer');
+    if (aurora) {
+        aurora.style.background = mood.auroraGradient;
+    }
 }
 
 // Start
