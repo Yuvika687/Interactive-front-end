@@ -64,6 +64,39 @@ body {
     transition: background 3s ease;
 }
 
+/* ---- Ultra Realistic Clouds (Wispy Cirrus Texture) ---- */
+.photoreal-clouds {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    left: -50%;
+    top: -50%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.007 0.012' numOctaves='6' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.4 0 0 0 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 1500px 1500px;
+    opacity: 0.35;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    animation: driftClouds 360s linear infinite;
+    -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0.8) 45%, rgba(0, 0, 0, 0) 70%);
+    mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0.8) 45%, rgba(0, 0, 0, 0) 70%);
+    z-index: 2;
+    transition: opacity 3s ease;
+}
+
+@keyframes driftClouds {
+    0% {
+        transform: rotate(0deg) scale(1) translate(0, 0);
+    }
+
+    50% {
+        transform: rotate(1deg) scale(1.05) translate(-1%, 1%);
+    }
+
+    100% {
+        transform: rotate(0deg) scale(1) translate(0, 0);
+    }
+}
+
 @keyframes slowRotate {
     0% {
         transform: rotate(0deg);
