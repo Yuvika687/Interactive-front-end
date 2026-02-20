@@ -70,18 +70,22 @@ function initCanvasSky() {
             if (currentOpacity < 0) currentOpacity = 0;
             if (currentOpacity > 1) currentOpacity = 1;
 
+            // SMALLER STARS: Microscopic pinpricks
+            let radius = (0.5 / star.z);
+            if (radius < 0.1) radius = 0.1;
+
             ctx.beginPath();
-            ctx.arc(star.x, star.y, (1.2 / star.z), 0, Math.PI * 2);
+            ctx.arc(star.x, star.y, radius, 0, Math.PI * 2);
             ctx.fillStyle = star.color;
             ctx.globalAlpha = currentOpacity;
             ctx.fill();
 
-            // Halo for very close stars
+            // Halo for very close stars - smaller halo
             if (star.z < 0.3 && currentOpacity > 0.8) {
                 ctx.beginPath();
-                ctx.arc(star.x, star.y, 4, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, 4);
-                grad.addColorStop(0, `rgba(255,255,255,${currentOpacity * 0.4})`);
+                ctx.arc(star.x, star.y, 1.5, 0, Math.PI * 2);
+                const grad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, 1.5);
+                grad.addColorStop(0, `rgba(255,255,255,${currentOpacity * 0.3})`);
                 grad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = grad;
                 ctx.fill();
@@ -162,7 +166,8 @@ function updateMood() {
                 text: 'dawn · misty peach',
                 gradient: 'linear-gradient(180deg, #0b1021 0%, #1a2035 50%, #3d3040 100%)',
                 canvasOpacity: '0.4',
-                auroraGradient: 'radial-gradient(ellipse at center, rgba(255, 180, 150, 0.1) 0%, transparent 60%)'
+                auroraGradient: 'radial-gradient(ellipse at center, rgba(255, 180, 150, 0.1) 0%, transparent 60%)',
+                cloudOpacity: '0.6'
             };
             break;
         case 1: // Day
@@ -170,7 +175,8 @@ function updateMood() {
                 text: 'day · pale azure',
                 gradient: 'linear-gradient(180deg, #101a30 0%, #203550 50%, #355070 100%)',
                 canvasOpacity: '0.1',
-                auroraGradient: 'radial-gradient(ellipse at center, rgba(180, 200, 255, 0.05) 0%, transparent 60%)'
+                auroraGradient: 'radial-gradient(ellipse at center, rgba(180, 200, 255, 0.05) 0%, transparent 60%)',
+                cloudOpacity: '0.85'
             };
             break;
         case 2: // Golden Hour
@@ -178,7 +184,8 @@ function updateMood() {
                 text: 'golden hour · deep embers',
                 gradient: 'linear-gradient(180deg, #080c18 0%, #151828 50%, #302025 100%)',
                 canvasOpacity: '0.6',
-                auroraGradient: 'radial-gradient(ellipse at center, rgba(255, 120, 80, 0.08) 0%, transparent 60%)'
+                auroraGradient: 'radial-gradient(ellipse at center, rgba(255, 120, 80, 0.08) 0%, transparent 60%)',
+                cloudOpacity: '0.5'
             };
             break;
         case 3: // Night
@@ -186,7 +193,8 @@ function updateMood() {
                 text: 'night · cinematic deep space',
                 gradient: 'linear-gradient(180deg, #02030a 0%, #050b1c 45%, #0c1330 100%)',
                 canvasOpacity: '1.0',
-                auroraGradient: 'radial-gradient(ellipse at 40% 60%, rgba(80, 120, 255, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 30%, rgba(200, 100, 255, 0.05) 0%, transparent 50%)'
+                auroraGradient: 'radial-gradient(ellipse at 40% 60%, rgba(80, 120, 255, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 30%, rgba(200, 100, 255, 0.05) 0%, transparent 50%)',
+                cloudOpacity: '0.35'
             };
             break;
     }
@@ -206,6 +214,11 @@ function updateMood() {
     const aurora = document.getElementById('aurora-layer');
     if (aurora) {
         aurora.style.background = mood.auroraGradient;
+    }
+
+    const cloudLayer = document.getElementById('cloud-layer');
+    if (cloudLayer) {
+        cloudLayer.style.opacity = mood.cloudOpacity;
     }
 }
 
