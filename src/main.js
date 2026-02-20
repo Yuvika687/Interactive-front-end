@@ -17,6 +17,56 @@ function initMnemonic() {
     // Start Time Loop
     updateMood();
     setInterval(updateMood, 60000); // Check every minute
+
+    // Generate photorealistic stars
+    generateStars();
+}
+
+function generateStars() {
+    const atmo = document.querySelector('.memory-atmosphere');
+    if (!atmo) return;
+
+    // Remove old constellation if it exists
+    const oldConst = document.querySelector('.constellation');
+    if (oldConst) oldConst.remove();
+
+    const starContainer = document.createElement('div');
+    starContainer.className = 'real-starfield';
+
+    for (let i = 0; i < 350; i++) {
+        const star = document.createElement('div');
+        star.className = 'real-star';
+
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const size = Math.random() < 0.95 ? (Math.random() * 1.5 + 0.5) : (Math.random() * 3 + 1.5);
+        const opacity = Math.random() * 0.8 + 0.1;
+        const duration = Math.random() * 4 + 2;
+
+        star.style.left = `${x}%`;
+        star.style.top = `${y}%`;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.opacity = opacity;
+        star.style.animationDuration = `${duration}s`;
+        star.style.animationDelay = `${Math.random() * 5}s`;
+
+        const colors = ['#ffffff', '#e8f0ff', '#f0f5ff', '#fff0e5', '#ffffff'];
+        star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        // Big stars get a subtle glow
+        if (size > 2.5) {
+            star.style.boxShadow = `0 0 ${size * 2}px ${star.style.backgroundColor}`;
+            star.style.borderRadius = '50%';
+        } else {
+            // Very tiny stars can just be square chunks rendered as dots
+            star.style.borderRadius = '50%';
+        }
+
+        starContainer.appendChild(star);
+    }
+
+    atmo.appendChild(starContainer);
 }
 
 function cycleManualTheme() {
@@ -61,30 +111,30 @@ function updateMood() {
     switch (themeIndex) {
         case 0: // Dawn
             mood = {
-                text: 'dawn · peach & gold',
-                gradient: 'radial-gradient(circle at 30% 40%, rgba(255, 215, 200, 0.35) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(255, 235, 200, 0.3) 0%, transparent 45%)',
-                cloudTint: '#ffdcb5' // Peach
+                text: 'dawn · misty peach',
+                gradient: 'linear-gradient(180deg, #0b1021 0%, #1a2035 50%, #3d3040 100%)',
+                cloudTint: 'rgba(200, 160, 150, 0.25)'
             };
             break;
         case 1: // Day
             mood = {
-                text: 'day · warm sand',
-                gradient: 'radial-gradient(circle at 50% 30%, rgba(255, 250, 240, 0.3) 0%, transparent 40%), radial-gradient(circle at 85% 70%, rgba(230, 215, 240, 0.2) 0%, transparent 45%)',
-                cloudTint: '#fffaf0' // Ivory
+                text: 'day · pale azure',
+                gradient: 'linear-gradient(180deg, #101a30 0%, #203550 50%, #355070 100%)',
+                cloudTint: 'rgba(180, 200, 220, 0.25)'
             };
             break;
         case 2: // Golden Hour
             mood = {
-                text: 'golden hour · nostalgia',
-                gradient: 'radial-gradient(circle at 60% 40%, rgba(255, 200, 150, 0.4) 0%, transparent 40%), radial-gradient(circle at 20% 80%, rgba(210, 190, 230, 0.25) 0%, transparent 45%)',
-                cloudTint: '#ffdea0' // Gold
+                text: 'golden hour · deep embers',
+                gradient: 'linear-gradient(180deg, #080c18 0%, #151828 50%, #302025 100%)',
+                cloudTint: 'rgba(180, 140, 120, 0.25)'
             };
             break;
         case 3: // Night
             mood = {
-                text: 'night · deep lavender',
-                gradient: 'radial-gradient(circle at 40% 30%, rgba(160, 140, 210, 0.3) 0%, transparent 40%), radial-gradient(circle at 70% 80%, rgba(100, 90, 180, 0.4) 0%, transparent 45%)',
-                cloudTint: '#e0d0ff' // Lavender
+                text: 'night · cinematic deep space',
+                gradient: 'linear-gradient(180deg, #02030a 0%, #050b1c 45%, #0c1330 100%)',
+                cloudTint: 'rgba(30, 45, 90, 0.15)' // subtle cool blue-indigo tint
             };
             break;
     }
@@ -94,18 +144,12 @@ function updateMood() {
     if (headerMoodEl) headerMoodEl.innerText = mood.text;
 
     if (gradientLayer) {
-        // Blend new gradient with base dark anchor
-        gradientLayer.style.background = `${mood.gradient}, linear-gradient(145deg, #050406, #000000)`; // Dark Anchor
+        gradientLayer.style.background = mood.gradient;
     }
 
-    // Tint Clouds
+    // Tint Clouds - Using radial-gradient directly so the SVG filter distorts a gradient mass, avoiding hard box edges
     clouds.forEach(cloud => {
-        cloud.style.background = mood.cloudTint;
-
-        // Update box-shadows dynamically
-        // Since we can't easily query the old box-shadow values to just replace color, we need to reconstruct them tailored to the specific cloud class
-        // BUT, a simpler CSS variable approach is better if we set it on the element
-        // For now, let's just set the Background and use the CSS Variable which we update below
+        cloud.style.background = `radial-gradient(ellipse at center, ${mood.cloudTint} 0%, transparent 65%)`;
     });
 
     document.documentElement.style.setProperty('--cloud-color', mood.cloudTint);
