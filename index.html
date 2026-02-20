@@ -12,41 +12,12 @@
 </head>
 
 <body>
-    <!-- SVG Filters for Photorealistic Clouds -->
-    <svg style="position: absolute; width: 0; height: 0; pointer-events: none;">
-        <filter id="real-cloud" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="5" seed="5" result="noise" />
-            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.2 0" in="noise"
-                result="coloredNoise" />
-            <feDisplacementMap in="SourceGraphic" in2="coloredNoise" scale="150" xChannelSelector="R"
-                yChannelSelector="G" />
-        </filter>
-        <filter id="real-cloud-slow" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="4" seed="2" result="noise" />
-            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.5 0" in="noise"
-                result="coloredNoise" />
-            <feDisplacementMap in="SourceGraphic" in2="coloredNoise" scale="200" xChannelSelector="R"
-                yChannelSelector="G" />
-        </filter>
-    </svg>
-
     <!-- Atmospheric Layer (Background) -->
     <div class="memory-atmosphere">
         <div class="atmo-gradient"></div>
-
-        <!-- LUXURIOUS CLOUDS -->
-        <div class="cloud-container">
-            <div class="cloud cloud-1"></div>
-            <div class="cloud cloud-2"></div>
-            <div class="cloud cloud-3"></div>
-        </div>
-
-        <div class="memory-particles">
-            <div class="particle"></div>
-            <div class="particle-2"></div>
-            <div class="particle-3"></div>
-        </div>
-        <div class="constellation"></div>
+        <canvas id="star-canvas"
+            style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none; transition: opacity 2s ease;"></canvas>
+        <div class="aurora" id="aurora-layer"></div>
     </div>
 
     <!-- Main Glass Dashboard -->

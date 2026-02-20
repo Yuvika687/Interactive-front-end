@@ -50,149 +50,27 @@ body {
     /* Very dark background */
 }
 
-/* ---- REALISTIC CLOUDS ---- */
-.cloud-container {
+/* ---- Photorealistic Aurora ---- */
+.aurora {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 5;
-    opacity: 0.85;
+    width: 200vw;
+    height: 200vh;
+    top: -50%;
+    left: -50%;
+    filter: blur(60px);
+    animation: slowRotate 180s linear infinite;
+    z-index: 0;
     pointer-events: none;
-}
-
-.cloud {
-    position: absolute;
-    border-radius: 50%;
     transition: background 3s ease;
-    mix-blend-mode: screen;
 }
 
-.cloud-1 {
-    width: 120vw;
-    height: 80vh;
-    top: -20%;
-    left: -20%;
-    filter: url('#real-cloud') blur(15px);
-    animation: driftCloud 180s linear infinite;
-}
-
-.cloud-2 {
-    width: 140vw;
-    height: 90vh;
-    top: 30%;
-    right: -30%;
-    filter: url('#real-cloud-slow') blur(20px);
-    animation: driftCloudReverse 240s linear infinite;
-    opacity: 0.7;
-}
-
-.cloud-3 {
-    width: 110vw;
-    height: 70vh;
-    bottom: -20%;
-    left: -10%;
-    filter: url('#real-cloud') blur(18px);
-    animation: driftCloud 200s linear infinite;
-    opacity: 0.8;
-}
-
-@keyframes driftCloud {
+@keyframes slowRotate {
     0% {
-        transform: translateX(-8%) scale(1);
-    }
-
-    50% {
-        transform: translateX(8%) scale(1.05);
+        transform: rotate(0deg);
     }
 
     100% {
-        transform: translateX(-8%) scale(1);
-    }
-}
-
-@keyframes driftCloudReverse {
-    0% {
-        transform: translateX(8%) scale(1.05);
-    }
-
-    50% {
-        transform: translateX(-8%) scale(1);
-    }
-
-    100% {
-        transform: translateX(8%) scale(1.05);
-    }
-}
-
-/* Particles - No Blur / No Bounding Box Artifacts */
-.memory-particles {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.particle {
-    position: absolute;
-    border-radius: 50%;
-    width: 35rem;
-    height: 35rem;
-    top: -15%;
-    left: -15%;
-    background: radial-gradient(circle, rgba(255, 245, 240, 0.05) 0%, transparent 70%);
-    animation: floatParticle 40s infinite alternate ease-in-out;
-}
-
-.particle-2 {
-    width: 45rem;
-    height: 45rem;
-    bottom: -20%;
-    right: -20%;
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(220, 200, 255, 0.04) 0%, transparent 70%);
-    animation: floatParticle2 34s infinite alternate;
-}
-
-.particle-3 {
-    width: 25rem;
-    height: 25rem;
-    top: 15%;
-    left: 55%;
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 220, 190, 0.05) 0%, transparent 70%);
-    animation: floatParticle3 28s infinite alternate;
-}
-
-/* Photorealistic Stars */
-.real-starfield {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.real-star {
-    position: absolute;
-    border-radius: 50%;
-    background: white;
-    box-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
-    animation: realTwinkle infinite alternate ease-in-out;
-}
-
-@keyframes realTwinkle {
-    0% {
-        filter: brightness(0.5) opacity(0.5);
-        transform: scale(0.9);
-    }
-
-    100% {
-        filter: brightness(1.5) opacity(1);
-        transform: scale(1.1);
+        transform: rotate(360deg);
     }
 }
 
@@ -260,19 +138,35 @@ body {
     z-index: 10;
     width: 100%;
     max-width: 1200px;
-    backdrop-filter: blur(36px) saturate(140%);
-    -webkit-backdrop-filter: blur(36px) saturate(140%);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.01) 100%);
     border-radius: 3.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    border-right: 1px solid rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.4);
+    border-left-color: rgba(255, 255, 255, 0.3);
     box-shadow:
+        0 30px 60px -10px rgba(0, 0, 0, 0.5),
         0 50px 100px -20px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     padding: 2.5rem 3rem;
-    transition: background 0.5s, border-color 0.5s;
+    transition: background 1s, border-color 1s, box-shadow 1s;
+    overflow: hidden;
+    /* For noise overlay */
+}
+
+/* Glass Noise Overlay for Photorealism */
+.vault-dashboard::before,
+.memory-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: -1;
+    border-radius: inherit;
 }
 
 .dashboard-content {
@@ -355,14 +249,15 @@ body {
 }
 
 .memory-card {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
-    border-right: 1px solid rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top-color: rgba(255, 255, 255, 0.2);
+    border-left-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
     padding: 1.8rem 1.5rem;
     color: #f0eae8;
@@ -375,9 +270,9 @@ body {
 .memory-card:hover {
     transform: translateY(-8px) translateZ(10px);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.3);
+    border-left-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .card-icon {
